@@ -12,11 +12,11 @@ class PlayersURLListSpider(Spider):
     start_urls = ['https://sofifa.com/?offset=0']
 
     def parse(self, response):
-        for jogador in response.css('tbody > tr'):
+        for row in response.css('tbody > tr'):
             yield {
                 'url': '{sofifa_url}{player_url}'.format(
                     sofifa_url=SOFIFA_URL,
-                    player_url=jogador.css('td.col-name')[0].css('a::attr(href)').get()
+                    player_url=row.css('td.col-name')[0].css('a::attr(href)').get()
                 )
             }
 
