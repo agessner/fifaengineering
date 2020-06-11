@@ -4,4 +4,4 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app
 WORKDIR /app/scrapy_sofifa/
-CMD [ "scrapy", "crawl", "players_url_list", "-o urls.json" ]
+CMD [ "scrapy", "crawl", "players_url_list" ]
