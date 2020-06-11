@@ -64,9 +64,9 @@ ROBOTSTXT_OBEY = True
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'scrapy_sofifa.pipelines.ScrapySofifaPipeline': 300,
-#}
+ITEM_PIPELINES = {
+   'scrapy_sofifa.pipelines.ScrapySofifaPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
@@ -88,3 +88,13 @@ ROBOTSTXT_OBEY = True
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+PLAYERS_URL_LIST_URI = 'data/urls.jl'
+FEEDS = {
+   PLAYERS_URL_LIST_URI: {
+      'format': 'jsonlines',
+      'store_empty': True,
+      'encoding': 'utf8',
+      'fields': None,
+      'indent': 4
+   }
+}
