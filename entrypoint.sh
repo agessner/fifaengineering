@@ -1,3 +1,3 @@
 #!/bin/bash
 
-airflow initdb & airflow webserver
+airflow initdb && airflow scheduler & airflow webserver -p 8080
