@@ -6,33 +6,17 @@
 # See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 from datetime import datetime
 
-from google.cloud import bigquery
-from google.cloud.bigquery import Dataset, Table, LoadJobConfig
 
-
-class ScrapySofifaPipeline:
+class PlayersURLListPipeline:
     def __init__(self):
-        self.bigquery_connection = None
-        self.table = None
         self.current_datetime = datetime.now()
 
     def process_item(self, item, spider):
         return {
             'value': item['url'],
-            'processed_at': self.current_datetime
+            'processed_at': self.current_datetime,
         }
 
-    def open_spider(self, spider):
-        self.bigquery_connection = bigquery.Client(project='fifaengineering')
-        self.bigquery_connection.create_dataset(
-            Dataset('fifaengineering.sofifa'),
-            exists_ok=True
-        )
-        self.table = Table('fifaengineering.sofifa.urls', schema=[
-            bigquery.schema.SchemaField('value', 'STRING'),
-            bigquery.schema.SchemaField('processed_at', 'DATETIME')
-        ])
-        self.bigquery_connection.create_table(self.table, exists_ok=True)
 
     def close_spider(self, spider):
         job_config = LoadJobConfig(
