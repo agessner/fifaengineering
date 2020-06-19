@@ -9,7 +9,21 @@ NUMBER_OF_PLAYERS_BY_PAGE = 60
 
 class PlayersURLListSpider(Spider):
     name = 'players_url_list'
-    start_urls = ['https://sofifa.com/?offset=0']
+    start_urls = 'https://sofifa.com/?offset=0',
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'scrapy_sofifa.pipelines.PlayersURLListPipeline': 400
+        },
+        'FEEDS': {
+            'data/urls.jl': {
+                'format': 'jsonlines',
+                'store_empty': True,
+                'encoding': 'utf8',
+                'fields': None,
+                'indent': 4
+            }
+        }
+    }
 
     def parse(self, response):
         for row in response.css('tbody > tr'):
