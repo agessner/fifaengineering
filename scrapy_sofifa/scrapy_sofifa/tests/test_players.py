@@ -77,7 +77,7 @@ class PlayersURLListTests(TestCase):
         with open('test_pages/players/test_messi.htm', 'r') as page:
             player = next(self.spider.parse(self.partial_html_response(body=page.read())))
 
-        self.assertEqual(Decimal('1.70'), player['height_in_feet_inches'])
+        self.assertEqual(Decimal('1.70'), player['height_in_meters'])
 
     def test_weight_in_kg(self):
         with open('test_pages/players/test_messi.htm', 'r') as page:

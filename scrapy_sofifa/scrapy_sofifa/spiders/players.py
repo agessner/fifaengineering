@@ -51,7 +51,7 @@ class PlayersSpider(Spider):
                 re.findall('(?<=\().+(?=\))', response.css('div.player .info > div::text').getall()[-1])[0],
                 '%b %d, %Y'
             ).date(),
-            'height_in_feet_inches': _convert_feet_inches_to_meters(
+            'height_in_meters': _convert_feet_inches_to_meters(
                 re.findall('(?<=\) ).+(?<=\")', response.css('div.player .info > div::text').getall()[-1])[0]
             ),
             'weight_in_kg': _convert_libras_to_kilograms(
