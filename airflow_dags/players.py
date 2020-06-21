@@ -145,8 +145,6 @@ players_list_to_bigquery = GoogleCloudStorageToBigQueryOperator(
         {'name': 'national_team_overall', 'type': 'INTEGER', 'mode': 'NULLABLE'},
         {'name': 'national_team_position', 'type': 'STRING', 'mode': 'NULLABLE'},
         {'name': 'national_team_jersey_number', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-        {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'},
-        {'name': 'value', 'type': 'STRING', 'mode': 'NULLABLE'},
         {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
     ],
     source_format='NEWLINE_DELIMITED_JSON',
@@ -158,4 +156,4 @@ players_list_to_bigquery = GoogleCloudStorageToBigQueryOperator(
 )
 
 generate_current_date >> get_urls_task >> urls_list_to_gcs >> urls_list_to_bigquery >> \
-    players_task >> gcs_players_path >> players_list_to_gcs >> players_list_to_bigquery
+    players_task >> players_list_to_gcs >> players_list_to_bigquery
