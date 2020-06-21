@@ -99,7 +99,7 @@ players_list_to_gcs = FileToGoogleCloudStorageOperator(
 players_list_to_bigquery = GoogleCloudStorageToBigQueryOperator(
     task_id='players_list_to_bq',
     bucket='sofifa',
-    source_objects=[gcs_path],
+    source_objects=[gcs_players_path],
     destination_project_dataset_table='fifaengineering.sofifa.players',
     schema_fields=[
         {'name': 'id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
