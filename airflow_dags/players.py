@@ -70,8 +70,8 @@ urls_list_to_bigquery = GoogleCloudStorageToBigQueryOperator(
     dag=dag
 )
 
-players_task = BashOperator(
-    task_id='players',
+get_players_task = BashOperator(
+    task_id='get_players',
     bash_command='cd {scrapy_path} && scrapy crawl players'.format(scrapy_path=SCRAPY_PATH),
     dag=dag,
     depends_on_past=True,
@@ -156,4 +156,4 @@ players_list_to_bigquery = GoogleCloudStorageToBigQueryOperator(
 )
 
 generate_current_date >> get_urls_task >> urls_list_to_gcs >> urls_list_to_bigquery >> \
-    players_task >> players_list_to_gcs >> players_list_to_bigquery
+    get_players_task >> players_list_to_gcs >> players_list_to_bigquery
