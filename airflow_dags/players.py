@@ -41,7 +41,7 @@ gcs_path = '{current_date}/urls-{current_date_time}.jl'.format(
     current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
 )
 
-urls_list_to_gcs = FileToGoogleCloudStorageOperator(
+load_urls_to_gcs = FileToGoogleCloudStorageOperator(
     task_id='load_urls_to_gcs',
     src='{scrapy_path}/data/urls.jl'.format(scrapy_path=SCRAPY_PATH),
     dst=gcs_path,
@@ -53,7 +53,7 @@ urls_list_to_gcs = FileToGoogleCloudStorageOperator(
     dag=dag
 )
 
-urls_list_to_bigquery = GoogleCloudStorageToBigQueryOperator(
+load_urls_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id='load_urls_to_bq',
     bucket='sofifa',
     source_objects=[gcs_path],
@@ -84,8 +84,8 @@ gcs_players_path = '{current_date}/players-{current_date_time}.jl'.format(
     current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
 )
 
-players_list_to_gcs = FileToGoogleCloudStorageOperator(
-    task_id='players_list_to_gcs',
+load_players_to_gcs = FileToGoogleCloudStorageOperator(
+    task_id='load_players_to_gcs',
     src='{scrapy_path}/data/players.jl'.format(scrapy_path=SCRAPY_PATH),
     dst=gcs_players_path,
     google_cloud_storage_conn_id='google_cloud_default',
@@ -96,8 +96,8 @@ players_list_to_gcs = FileToGoogleCloudStorageOperator(
     dag=dag
 )
 
-players_list_to_bigquery = GoogleCloudStorageToBigQueryOperator(
-    task_id='players_list_to_bq',
+load_players_to_bq = GoogleCloudStorageToBigQueryOperator(
+    task_id='load_players_to_bq',
     bucket='sofifa',
     source_objects=[gcs_players_path],
     destination_project_dataset_table='fifaengineering.sofifa.players',
@@ -155,5 +155,6 @@ players_list_to_bigquery = GoogleCloudStorageToBigQueryOperator(
     dag=dag
 )
 
-generate_current_date >> get_urls_task >> urls_list_to_gcs >> urls_list_to_bigquery >> \
-    get_players_task >> players_list_to_gcs >> players_list_to_bigquery
+generate_current_date >> \
+    get_urls_task >> load_urls_to_gcs >> load_urls_to_bq >> \
+    get_players_task >> load_players_to_gcs >> load_players_to_bq
