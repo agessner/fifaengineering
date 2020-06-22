@@ -24,3 +24,12 @@ class PlayersPipeline:
 
     def process_item(self, item, spider):
         return {**item, **{'processed_at': self.current_datetime}}
+
+
+class DefaultPipeline:
+    def __init__(self):
+        self.current_datetime = datetime.now()
+
+    def process_item(self, item, spider):
+        return {**item, **{'processed_at': self.current_datetime}}
+

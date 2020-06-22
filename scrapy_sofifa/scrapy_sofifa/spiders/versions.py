@@ -4,6 +4,20 @@ from scrapy import Spider, Request
 class VersionsSpider(Spider):
     name = 'versions'
     start_urls = ['https://sofifa.com/players']
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'scrapy_sofifa.pipelines.DefaultPipeline': 400
+        },
+        'FEEDS': {
+            'data/versions.jl': {
+                'format': 'jsonlines',
+                'store_empty': True,
+                'encoding': 'utf8',
+                'fields': None,
+                'indent': 4
+            }
+        }
+    }
 
     def parse(self, response):
         current_page_main_version, next_page_main_version = _get_current_and_next_page_main_versions(response)
