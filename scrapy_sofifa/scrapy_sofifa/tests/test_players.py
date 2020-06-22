@@ -554,3 +554,38 @@ class WhenTeamAndNationalTeamAreSwitchedTests(TestCase):
             player = next(self.spider.parse(self.partial_html_response(body=page.read())))
 
         self.assertEqual(7, player['national_team_jersey_number'])
+
+
+class WhenNoJoinedDateNorLoanedTests(TestCase):
+    def setUp(self):
+        self.spider = PlayersSpider()
+        self.partial_html_response = partial(
+            HtmlResponse,
+            url='http://test.com',
+            request=scrapy.Request(url='http://test.com'),
+            encoding='utf-8'
+        )
+
+    def test_joined(self):
+        with open('test_pages/players/test_no_joined_date_nor_loaned.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['joined'])
+
+    def test_loaned_from(self):
+        with open('test_pages/players/test_no_joined_date_nor_loaned.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['loaned_from'])
+
+    def test_loaned_from_team_url(self):
+        with open('test_pages/players/test_no_joined_date_nor_loaned.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['loaned_from_team_url'])
+
+    def test_contract_valid_until_when_year(self):
+        with open('test_pages/players/test_no_joined_date_nor_loaned.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(date(2009, 12, 31), player['contract_valid_until'])

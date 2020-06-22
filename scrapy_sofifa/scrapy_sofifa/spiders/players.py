@@ -86,15 +86,10 @@ class PlayersSpider(Spider):
             'team_overall': int(_get_team_info(response, 'div.player-card > ul > li > span:nth-child(1)::text')) if _get_team_info(response, 'div.player-card > ul > li > span:nth-child(1)::text') else '',
             'team_position': _get_team_info(response, 'div.player-card > ul > li:nth-child(2) > span::text'),
             'team_jersey_number': int(_get_team_info(response, 'div.player-card > ul > li:nth-child(3)::text')) if _get_team_info(response, 'div.player-card > ul > li:nth-child(3)::text') else '',
-            'joined': _convert_date(_get_team_info(response, 'div.player-card > ul > li:nth-child(4)::text')) if not _is_loaned(response.css('div.player-card > ul > li:nth-child(4)::text').getall()) else '',
-            'loaned_from': _get_team_info(response, 'div.player-card > ul > li:nth-child(4) a::text') if _is_loaned(response.css('div.player-card > ul > li:nth-child(4)::text').getall()) else '',
-            'loaned_from_team_url': '{sofifa_url}{team_url}'.format(
-                sofifa_url=SOFIFA_URL,
-                team_url=_get_team_info(response, 'div.player-card > ul > li:nth-child(4) a::attr(href)')
-            ) if _is_loaned(response.css('div.player-card > ul > li:nth-child(4)::text').getall()) and _get_team_info(response, 'div.player-card > ul > li:nth-child(4) a::attr(href)') else '',
-            'contract_valid_until': _get_contract_valid_until(
-                _get_team_info(response, 'div.player-card > ul > li:nth-child(5)::text')
-            ) if _get_team_info(response, 'div.player-card > ul > li:nth-child(5)::text') else '',
+            'joined': _get_joined(response),
+            'loaned_from': _get_loaned_from(response),
+            'loaned_from_team_url': _get_loaned_from_team_url(response),
+            'contract_valid_until': _get_contract_valid_until(response),
             'national_team_name': _get_national_team_info(response, TEAM_NAMES_PATH),
             'national_team_url': _get_national_team_url(response),
             'national_team_image_url': _get_national_team_info(response, 'div.player-card > img::attr(data-src)'),
@@ -153,6 +148,39 @@ def _get_team_info(response, info_path):
     return response.css(info_path).getall()[0]
 
 
+def _get_joined(response):
+    if not _has_joined_or_loaned_info(response):
+        return ''
+    if _is_loaned(response.css('div.player-card > ul > li:nth-child(4)::text').getall()):
+        return ''
+    return _convert_date(_get_team_info(response, 'div.player-card > ul > li:nth-child(4)::text'))
+
+
+def _get_loaned_from(response):
+    if not _has_joined_or_loaned_info(response):
+        return ''
+    if not _is_loaned(response.css('div.player-card > ul > li:nth-child(4)::text').getall()):
+        return ''
+    return _get_team_info(response, 'div.player-card > ul > li:nth-child(4) a::text')
+
+
+def _get_loaned_from_team_url(response):
+    if not _has_joined_or_loaned_info(response):
+        return ''
+    if not _is_loaned(response.css('div.player-card > ul > li:nth-child(4)::text').getall()):
+        return ''
+    return '{sofifa_url}{team_url}'.format(
+        sofifa_url=SOFIFA_URL,
+        team_url=_get_team_info(response, 'div.player-card > ul > li:nth-child(4) a::attr(href)')
+    )
+
+
+def _has_joined_or_loaned_info(response):
+    if len(response.css('div.player-card > ul > li:nth-child(4) > label::text').getall()) == 0:
+        return False
+    return response.css('div.player-card > ul > li:nth-child(4) > label::text').getall()[0] in ['Joined', 'Loaned From']
+
+
 NATIONAL_TEAMS = [
     'France', 'Germany', 'Spain', 'Belgium', 'Italy', 'Portugual', 'Netherlands', 'England', 'Argentina', 'Brazil',
     'Colombia', 'Uruguay', 'Austria', 'Denmark', 'Switzerland', 'Mexico', 'Poland', 'Russia', 'Turkey', 'Chile',
@@ -209,7 +237,13 @@ def _is_loaned(element):
     return not bool(element)
 
 
-def _get_contract_valid_until(value):
+def _get_contract_valid_until(response):
+    if _has_joined_or_loaned_info(response) \
+            and not _get_team_info(response, 'div.player-card > ul > li:nth-child(5)::text'):
+        return ''
+    value = _get_team_info(response, 'div.player-card > ul > li:nth-child(5)::text') \
+        if _has_joined_or_loaned_info(response) \
+        else _get_team_info(response, 'div.player-card > ul > li:nth-child(4)::text')
     is_a_year = _is_a_number(value)
     return date(int(value), 12, 31) if is_a_year else _convert_date(value)
 
