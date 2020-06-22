@@ -28,6 +28,50 @@ generate_current_date = PythonOperator(
 )
 
 
+get_versions_task = BashOperator(
+    task_id='get_versions',
+    bash_command='cd {scrapy_path} && scrapy crawl versions'.format(scrapy_path=SCRAPY_PATH),
+    dag=dag,
+    depends_on_past=True,
+    wait_for_downstream=True,
+)
+
+gcs_versions_path = '{current_date}/versions-{current_date_time}.jl'.format(
+    current_date=date.strftime(date.today(), '%Y-%m-%d'),
+    current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
+)
+
+load_versions_to_gcs = FileToGoogleCloudStorageOperator(
+    task_id='load_versions_to_gcs',
+    src='{scrapy_path}/data/versions.jl'.format(scrapy_path=SCRAPY_PATH),
+    dst=gcs_versions_path,
+    google_cloud_storage_conn_id='google_cloud_default',
+    bucket='sofifa',
+    depends_on_past=True,
+    wait_for_downstream=True,
+    mime_type='application/x-ndjson',
+    dag=dag
+)
+
+load_versions_to_bq = GoogleCloudStorageToBigQueryOperator(
+    task_id='load_versions_to_bq',
+    bucket='sofifa',
+    source_objects=[gcs_versions_path],
+    destination_project_dataset_table='fifaengineering.sofifa.versions',
+    schema_fields=[
+        {'name': 'main_version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
+        {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+        {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
+        {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
+    ],
+    source_format='NEWLINE_DELIMITED_JSON',
+    bigquery_conn_id='google_cloud_default',
+    write_disposition='WRITE_APPEND',
+    depends_on_past=True,
+    wait_for_downstream=True,
+    dag=dag
+)
+
 get_urls_task = BashOperator(
     task_id='get_urls',
     bash_command='cd {scrapy_path} && scrapy crawl players_url_list'.format(scrapy_path=SCRAPY_PATH),
@@ -156,5 +200,6 @@ load_players_to_bq = GoogleCloudStorageToBigQueryOperator(
 )
 
 generate_current_date >> \
+    get_versions_task >> load_versions_to_gcs >> load_versions_to_bq >> \
     get_urls_task >> load_urls_to_gcs >> load_urls_to_bq >> \
     get_players_task >> load_players_to_gcs >> load_players_to_bq
