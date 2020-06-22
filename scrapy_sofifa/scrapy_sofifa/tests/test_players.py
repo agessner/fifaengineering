@@ -556,6 +556,113 @@ class WhenTeamAndNationalTeamAreSwitchedTests(TestCase):
         self.assertEqual(7, player['national_team_jersey_number'])
 
 
+class WhenNoTeamNorNationalTeamTests(TestCase):
+    def setUp(self):
+        self.spider = PlayersSpider()
+        self.partial_html_response = partial(
+            HtmlResponse,
+            url='http://test.com',
+            request=scrapy.Request(url='http://test.com'),
+            encoding='utf-8'
+        )
+
+    def test_team_name(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['team_name'])
+
+    def test_team_url(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['team_url'])
+
+    def test_team_image_url(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['team_image_url'])
+
+    def test_team_overall(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['team_overall'])
+
+    def test_team_position(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['team_position'])
+
+    def test_team_jersey_number(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['team_jersey_number'])
+
+    def test_joined(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['joined'])
+
+    def test_loaned_from(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['loaned_from'])
+
+    def test_loaned_from_team_url(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['loaned_from_team_url'])
+
+    def test_contract_valid_until(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['contract_valid_until'])
+
+    def test_national_team_name(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['national_team_name'])
+
+    def test_national_team_url(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['national_team_url'])
+
+    def test_national_team_image_url(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['national_team_image_url'])
+
+    def test_national_team_overall(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['national_team_overall'])
+
+    def test_national_team_position(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['national_team_position'])
+
+    def test_national_team_jersey_number(self):
+        with open('test_pages/players/test_no_tem_nor_national_team.htm') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['national_team_jersey_number'])
+
+
 class WhenNoJoinedDateNorLoanedTests(TestCase):
     def setUp(self):
         self.spider = PlayersSpider()

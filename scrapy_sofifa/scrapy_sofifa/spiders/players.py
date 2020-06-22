@@ -138,6 +138,9 @@ def _create_speciality(a_element):
 
 
 def _get_team_info(response, info_path):
+    if not response.css(info_path).getall():
+        return ''
+
     if _first_column_is_a_national_team(response):
         if _has_second_team_column(response):
             has_information_in_both_teams = len(response.css(info_path).getall()) > 1
@@ -215,6 +218,8 @@ def _has_second_team_column(response):
 
 
 def _first_column_is_a_national_team(response):
+    if not response.css(TEAM_NAMES_PATH).getall():
+        return ''
     first_team_name = response.css(TEAM_NAMES_PATH).getall()[0]
     return _is_a_national_team(first_team_name)
 
