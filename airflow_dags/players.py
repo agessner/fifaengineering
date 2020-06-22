@@ -15,7 +15,7 @@ dag = DAG(
     'players',
     description='Populate the players data on BQ',
     start_date=days_ago(1),
-    schedule_interval=timedelta(hours=4),
+    schedule_interval=timedelta(hours=12),
 )
 
 generate_current_date = PythonOperator(
