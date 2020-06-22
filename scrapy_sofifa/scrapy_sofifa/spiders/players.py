@@ -184,7 +184,7 @@ def _has_joined_or_loaned_info(response):
 NATIONAL_TEAMS = [
     'France', 'Germany', 'Spain', 'Belgium', 'Italy', 'Portugual', 'Netherlands', 'England', 'Argentina', 'Brazil',
     'Colombia', 'Uruguay', 'Austria', 'Denmark', 'Switzerland', 'Mexico', 'Poland', 'Russia', 'Turkey', 'Chile',
-    'Czech Republic', 'Norway', 'Scotland', 'Sweeden', 'Côte d\'Ivoire', 'Republic of Ireland', 'Cameroon', 'Egypt',
+    'Czech Republic', 'Norway', 'Scotland', 'Sweden', 'Côte d\'Ivoire', 'Republic of Ireland', 'Cameroon', 'Egypt',
     'Greece', 'Slovenia', 'Wales', 'Paraguay', 'United States', 'Peru', 'Romania', 'Hungary', 'Ecuador', 'Venezuela',
     'Iceland', 'Australia', 'Northern Ireland', 'Canada', 'South Africa', 'Finland', 'Cinha PR', 'Bolivia', 'New Zealand',
     'Bulgaria', 'India'
