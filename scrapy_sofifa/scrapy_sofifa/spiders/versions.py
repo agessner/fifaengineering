@@ -36,7 +36,7 @@ class VersionsSpider(Spider):
 
 
 def get_id_from_version_link(link):
-    return link.replace('/?r=', '').replace('/players?r=', '').replace('&set=true', '')
+    return link.replace('/players?r=', '').replace('&set=true', '')
 
 
 def get_current_and_next_page_main_versions(response):
