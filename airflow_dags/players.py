@@ -57,7 +57,7 @@ load_versions_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id='load_versions_to_bq',
     bucket='sofifa',
     source_objects=[gcs_versions_path],
-    destination_project_dataset_table='fifaengineering.sofifa.versions',
+    destination_project_dataset_table='fifaeng.sofifa.versions',
     schema_fields=[
         {'name': 'main_version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
         {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
@@ -101,7 +101,7 @@ load_urls_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id='load_urls_to_bq',
     bucket='sofifa',
     source_objects=[gcs_path],
-    destination_project_dataset_table='fifaengineering.sofifa.urls',
+    destination_project_dataset_table='fifaeng.sofifa.urls',
     schema_fields=[
         {'name': 'value', 'type': 'STRING', 'mode': 'NULLABLE'},
         {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
@@ -144,7 +144,7 @@ load_players_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id='load_players_to_bq',
     bucket='sofifa',
     source_objects=[gcs_players_path],
-    destination_project_dataset_table='fifaengineering.sofifa.players',
+    destination_project_dataset_table='fifaeng.sofifa.players',
     schema_fields=[
         {'name': 'id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
         {'name': 'full_name', 'type': 'STRING', 'mode': 'NULLABLE'},

@@ -27,7 +27,7 @@ class PlayersURLListSpider(Spider):
     }
 
     def start_requests(self):
-        bigquery_connection = bigquery.Client(project='fifaengineering')
+        bigquery_connection = bigquery.Client(project='fifaeng')
         query = bigquery_connection.query('''
             SELECT 
                 version_id
