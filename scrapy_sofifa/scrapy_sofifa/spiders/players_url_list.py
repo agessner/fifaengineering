@@ -32,6 +32,7 @@ class PlayersURLListSpider(Spider):
             SELECT 
                 version_id
             FROM sofifa.versions WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.versions) 
+            LIMIT 1
         ''')
         for url in query.result():
             yield Request(url=BASE_URL.format(

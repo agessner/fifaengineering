@@ -33,6 +33,7 @@ class PlayersSpider(Spider):
             SELECT 
                 value
             FROM sofifa.urls WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.urls) 
+            LIMIT 100
         ''')
         for url in query.result():
             yield Request(url=url['value'])
