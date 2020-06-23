@@ -20,14 +20,14 @@ class VersionsSpider(Spider):
     }
 
     def parse(self, response):
-        current_page_main_version, next_page_main_version = _get_current_and_next_page_main_versions(response)
+        current_page_main_version, next_page_main_version = get_current_and_next_page_main_versions(response)
         for (link, name) in zip(
             response.css('div.dropdown:nth-child(2) > div.bp3-menu > a::attr(href)').getall(),
             response.css('div.dropdown:nth-child(2) > div.bp3-menu > a::text').getall()
         ):
             yield {
                 'main_version_name': current_page_main_version[1],
-                'version_id': link.replace('/players?r=', '').replace('&set=true', ''),
+                'version_id': get_id_from_version_link(link),
                 'version_name': name
             }
 
@@ -35,7 +35,11 @@ class VersionsSpider(Spider):
             yield Request('https://sofifa.com{link}'.format(link=next_page_main_version[0]), callback=self.parse)
 
 
-def _get_current_and_next_page_main_versions(response):
+def get_id_from_version_link(link):
+    return link.replace('/?r=', '').replace('/players?r=', '').replace('&set=true', '')
+
+
+def get_current_and_next_page_main_versions(response):
     current_page_main_version_name = response.css('div.dropdown:nth-child(1) > a > span.bp3-button-text::text').get()
     main_versions = list(zip(
         response.css('div.dropdown:nth-child(1) > div.bp3-menu > a::attr(href)').getall(),

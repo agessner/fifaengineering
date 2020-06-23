@@ -14,6 +14,7 @@ class PlayersURLListPipeline:
     def process_item(self, item, spider):
         return {
             'value': item['url'],
+            'version_id': item['version_id'],
             'processed_at': self.current_datetime,
         }
 
