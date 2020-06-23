@@ -47,8 +47,7 @@ class PlayersURLListSpider(Spider):
                 'url': '{sofifa_url}{player_url}'.format(
                     sofifa_url=SOFIFA_URL,
                     player_url=row.css('td.col-name')[0].css('a::attr(href)').get()
-                ),
-                'version_id': get_id_from_version_link(get_current_and_next_page_main_versions(response)[0][0])
+                )
             }
 
         next_page = self._get_next_page(response)

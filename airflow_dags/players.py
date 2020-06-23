@@ -104,7 +104,6 @@ load_urls_to_bq = GoogleCloudStorageToBigQueryOperator(
     destination_project_dataset_table='fifaengineering.sofifa.urls',
     schema_fields=[
         {'name': 'value', 'type': 'STRING', 'mode': 'NULLABLE'},
-        {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
         {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
     ],
     source_format='NEWLINE_DELIMITED_JSON',

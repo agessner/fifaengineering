@@ -32,7 +32,6 @@ class PlayersURLListTests(TestCase):
 
         self.assertEqual(61, len(urls))
         self.assertEqual('https://sofifa.com/player/226807/cristian-roldan/200044/', urls[0]['url'])
-        self.assertEqual('200044', urls[0]['version_id'])
 
     @patch('scrapy_sofifa.scrapy_sofifa.spiders.players_url_list.Request')
     def test_create_the_next_request_when_it_has_the_next_link_and_is_the_first_page(self, request_mock):
