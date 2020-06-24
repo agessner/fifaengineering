@@ -20,43 +20,44 @@ dag = DAG(
 
 generate_current_date = PythonOperator(
     task_id='generate_current_date',
-    python_callable=lambda ds, **kwargs: str(datetime.now()),
+    python_callable=lambda ds, **kwargs: datetime.now().strftime('%Y%m%d_%H%M%S'),
     provide_context=True,
     dag=dag,
     depends_on_past=True,
     wait_for_downstream=True
 )
 
+filename = '{entity}/{current_date_time}.jl'
+gcs_path = 'gs://sofifa/{filename}'.format(filename=filename)
 
 get_versions_task = BashOperator(
     task_id='get_versions',
-    bash_command='cd {scrapy_path} && scrapy crawl versions'.format(scrapy_path=SCRAPY_PATH),
+    bash_command="""
+        cd {scrapy_path} && 
+        scrapy crawl versions && 
+        gsutil mv {scrapy_path}data/versions.jl {gcs_versions_path}
+    """.format(
+        scrapy_path=SCRAPY_PATH,
+        gcs_versions_path=gcs_path.format(
+            entity='versions',
+            current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
+        )
+    ),
     dag=dag,
     depends_on_past=True,
     wait_for_downstream=True,
 )
 
-gcs_versions_path = '{current_date}/versions-{current_date_time}.jl'.format(
-    current_date=date.strftime(date.today(), '%Y-%m-%d'),
-    current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
-)
-
-load_versions_to_gcs = FileToGoogleCloudStorageOperator(
-    task_id='load_versions_to_gcs',
-    src='{scrapy_path}/data/versions.jl'.format(scrapy_path=SCRAPY_PATH),
-    dst=gcs_versions_path,
-    google_cloud_storage_conn_id='google_cloud_default',
-    bucket='sofifa',
-    depends_on_past=True,
-    wait_for_downstream=True,
-    mime_type='application/x-ndjson',
-    dag=dag
-)
 
 load_versions_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id='load_versions_to_bq',
     bucket='sofifa',
-    source_objects=[gcs_versions_path],
+    source_objects=[
+        filename.format(
+            entity='versions',
+            current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
+        )
+    ],
     destination_project_dataset_table='fifaeng.sofifa.versions',
     schema_fields=[
         {'name': 'main_version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
@@ -74,33 +75,31 @@ load_versions_to_bq = GoogleCloudStorageToBigQueryOperator(
 
 get_urls_task = BashOperator(
     task_id='get_urls',
-    bash_command='cd {scrapy_path} && scrapy crawl players_url_list'.format(scrapy_path=SCRAPY_PATH),
+    bash_command="""
+        cd {scrapy_path} && 
+        scrapy crawl players_url_list && 
+        gsutil mv {scrapy_path}data/urls.jl {gcs_versions_path}
+    """.format(
+        scrapy_path=SCRAPY_PATH,
+        gcs_versions_path=gcs_path.format(
+            entity='urls',
+            current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
+        )
+    ),
     dag=dag,
     depends_on_past=True,
     wait_for_downstream=True,
 )
 
-gcs_path = '{current_date}/urls-{current_date_time}.jl'.format(
-    current_date=date.strftime(date.today(), '%Y-%m-%d'),
-    current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
-)
-
-load_urls_to_gcs = FileToGoogleCloudStorageOperator(
-    task_id='load_urls_to_gcs',
-    src='{scrapy_path}/data/urls.jl'.format(scrapy_path=SCRAPY_PATH),
-    dst=gcs_path,
-    google_cloud_storage_conn_id='google_cloud_default',
-    bucket='sofifa',
-    depends_on_past=True,
-    wait_for_downstream=True,
-    mime_type='application/x-ndjson',
-    dag=dag
-)
-
 load_urls_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id='load_urls_to_bq',
     bucket='sofifa',
-    source_objects=[gcs_path],
+    source_objects=[
+        filename.format(
+            entity='urls',
+            current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
+        )
+    ],
     destination_project_dataset_table='fifaeng.sofifa.urls',
     schema_fields=[
         {'name': 'value', 'type': 'STRING', 'mode': 'NULLABLE'},
@@ -116,34 +115,31 @@ load_urls_to_bq = GoogleCloudStorageToBigQueryOperator(
 
 get_players_task = BashOperator(
     task_id='get_players',
-    bash_command='cd {scrapy_path} && scrapy crawl players'.format(scrapy_path=SCRAPY_PATH),
+    bash_command="""
+        cd {scrapy_path} && 
+        scrapy crawl players && 
+        gsutil mv {scrapy_path}data/players.jl {gcs_versions_path}
+    """.format(
+        scrapy_path=SCRAPY_PATH,
+        gcs_versions_path=gcs_path.format(
+            entity='players',
+            current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
+        )
+    ),
     dag=dag,
     depends_on_past=True,
     wait_for_downstream=True,
 )
 
-
-gcs_players_path = '{current_date}/players-{current_date_time}.jl'.format(
-    current_date=date.strftime(date.today(), '%Y-%m-%d'),
-    current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
-)
-
-load_players_to_gcs = FileToGoogleCloudStorageOperator(
-    task_id='load_players_to_gcs',
-    src='{scrapy_path}/data/players.jl'.format(scrapy_path=SCRAPY_PATH),
-    dst=gcs_players_path,
-    google_cloud_storage_conn_id='google_cloud_default',
-    bucket='sofifa',
-    depends_on_past=True,
-    wait_for_downstream=True,
-    mime_type='application/x-ndjson',
-    dag=dag
-)
-
 load_players_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id='load_players_to_bq',
     bucket='sofifa',
-    source_objects=[gcs_players_path],
+    source_objects=[
+        filename.format(
+            entity='players',
+            current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
+        )
+    ],
     destination_project_dataset_table='fifaeng.sofifa.players',
     schema_fields=[
         {'name': 'id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
@@ -200,6 +196,6 @@ load_players_to_bq = GoogleCloudStorageToBigQueryOperator(
 )
 
 generate_current_date >> \
-    get_versions_task >> load_versions_to_gcs >> load_versions_to_bq >> \
-    get_urls_task >> load_urls_to_gcs >> load_urls_to_bq >> \
-    get_players_task >> load_players_to_gcs >> load_players_to_bq
+    get_versions_task >> load_versions_to_bq >> \
+    get_urls_task >> load_urls_to_bq >> \
+    get_players_task >> load_players_to_bq
