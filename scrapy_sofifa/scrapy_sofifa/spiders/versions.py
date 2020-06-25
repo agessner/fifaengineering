@@ -1,5 +1,7 @@
 from scrapy import Spider, Request
 
+from spiders.players import _convert_date
+
 
 class VersionsSpider(Spider):
     name = 'versions'
@@ -21,14 +23,14 @@ class VersionsSpider(Spider):
 
     def parse(self, response):
         current_page_main_version, next_page_main_version = get_current_and_next_page_main_versions(response)
-        for (link, name) in zip(
+        for (link, release_date) in zip(
             response.css('div.dropdown:nth-child(2) > div.bp3-menu > a::attr(href)').getall(),
             response.css('div.dropdown:nth-child(2) > div.bp3-menu > a::text').getall()
         ):
             yield {
-                'main_version_name': current_page_main_version[1],
+                'version_name': current_page_main_version[1],
                 'version_id': get_id_from_version_link(link),
-                'version_name': name
+                'release_date': _convert_date(release_date)
             }
 
         if next_page_main_version:

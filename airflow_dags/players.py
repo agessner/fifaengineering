@@ -60,9 +60,9 @@ load_versions_to_bq = GoogleCloudStorageToBigQueryOperator(
     ],
     destination_project_dataset_table='fifaeng.sofifa.versions',
     schema_fields=[
-        {'name': 'main_version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
-        {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
         {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
+        {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+        {'name': 'release_date', 'type': 'DATE', 'mode': 'NULLABLE'},
         {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
     ],
     source_format='NEWLINE_DELIMITED_JSON',

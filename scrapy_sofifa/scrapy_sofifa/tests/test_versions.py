@@ -1,3 +1,4 @@
+from datetime import date
 from functools import partial
 from unittest import TestCase
 
@@ -25,12 +26,12 @@ class VersionsTests(TestCase):
 
         versions_without_next_request = versions_returned[:-1]
         self.assertEqual(2, len(versions_without_next_request))
-        self.assertEqual('FIFA 08', versions_without_next_request[0]['main_version_name'])
+        self.assertEqual('FIFA 08', versions_without_next_request[0]['version_name'])
         self.assertEqual('080002', versions_without_next_request[0]['version_id'])
-        self.assertEqual('Feb 22, 2008', versions_without_next_request[0]['version_name'])
-        self.assertEqual('FIFA 08', versions_without_next_request[1]['main_version_name'])
+        self.assertEqual(date(2008, 2, 22), versions_without_next_request[0]['release_date'])
+        self.assertEqual('FIFA 08', versions_without_next_request[1]['version_name'])
         self.assertEqual('080001', versions_without_next_request[1]['version_id'])
-        self.assertEqual('Aug 30, 2007', versions_without_next_request[1]['version_name'])
+        self.assertEqual(date(2007, 8, 30), versions_without_next_request[1]['release_date'])
 
     def test_return_next_request(self):
         with open('test_pages/versions/test_fifa_08_page.htm', 'r') as page:
@@ -48,9 +49,9 @@ class VersionsTests(TestCase):
             )))
 
         self.assertEqual(2, len(versions_returned))
-        self.assertEqual('FIFA 07', versions_returned[0]['main_version_name'])
+        self.assertEqual('FIFA 07', versions_returned[0]['version_name'])
         self.assertEqual('070002', versions_returned[0]['version_id'])
-        self.assertEqual('Feb 22, 2007', versions_returned[0]['version_name'])
-        self.assertEqual('FIFA 07', versions_returned[1]['main_version_name'])
+        self.assertEqual(date(2007, 2, 22), versions_returned[0]['release_date'])
+        self.assertEqual('FIFA 07', versions_returned[1]['version_name'])
         self.assertEqual('070001', versions_returned[1]['version_id'])
-        self.assertEqual('Aug 30, 2006', versions_returned[1]['version_name'])
+        self.assertEqual(date(2006, 8, 30), versions_returned[1]['release_date'])
