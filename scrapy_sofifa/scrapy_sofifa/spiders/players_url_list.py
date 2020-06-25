@@ -22,9 +22,13 @@ class PlayersURLListSpider(Spider):
         query = bigquery_connection.query('''
             SELECT 
                 version_id
-            FROM sofifa.versions WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.versions) 
+            FROM sofifa.versions WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.versions)
+            AND version_name = "FIFA {version}" 
+            ORDER BY version_id DESC
             LIMIT 1
-        ''')
+        '''.format(
+            version=self.version
+        ))
         for url in query.result():
             yield Request(url=BASE_URL.format(
                 version_id=url['version_id'],
