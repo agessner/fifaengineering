@@ -73,10 +73,9 @@ load_versions_to_bq = GoogleCloudStorageToBigQueryOperator(
 
 
 def _create_tasks_factory(version):
-    filename = '{entity}/{version}/{current_date_time}.jl'
-    gcs_path = 'gs://sofifa/{filename}'.format(filename=filename, version=version)
+    gcs_path = 'gs://sofifa/{entity}/{version}/{current_date_time}.jl'
     return BashOperator(
-        task_id='get_urls',
+        task_id='get_urls_{version}'.format(version=version),
         bash_command="""
             cd {scrapy_path} && 
             scrapy crawl players_url_list -o /tmp/{scrapy_path}{version}/data/urls.jl -a version={version} && 
@@ -85,6 +84,7 @@ def _create_tasks_factory(version):
             scrapy_path=SCRAPY_PATH,
             gcs_versions_path=gcs_path.format(
                 entity='urls',
+                version=version,
                 current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
             ),
             version=version
@@ -93,11 +93,12 @@ def _create_tasks_factory(version):
         depends_on_past=True,
         wait_for_downstream=True,
     ), GoogleCloudStorageToBigQueryOperator(
-        task_id='load_urls_to_bq',
+        task_id='load_urls_to_bq_{version}'.format(version=version),
         bucket='sofifa',
         source_objects=[
-            filename.format(
+            '{entity}/{version}/{current_date_time}.jl'.format(
                 entity='urls',
+                version=version,
                 current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
             )
         ],
@@ -113,7 +114,7 @@ def _create_tasks_factory(version):
         wait_for_downstream=True,
         dag=dag
     ), BashOperator(
-        task_id='get_players',
+        task_id='get_players_{version}'.format(version=version),
         bash_command="""
             cd {scrapy_path} && 
             scrapy crawl players -o /tmp/{scrapy_path}data/players.jl -a version={version} && 
@@ -122,6 +123,7 @@ def _create_tasks_factory(version):
             scrapy_path=SCRAPY_PATH,
             gcs_versions_path=gcs_path.format(
                 entity='players',
+                version=version,
                 current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
             ),
             version=version
@@ -130,11 +132,12 @@ def _create_tasks_factory(version):
         depends_on_past=True,
         wait_for_downstream=True,
     ), GoogleCloudStorageToBigQueryOperator(
-        task_id='load_players_to_bq',
+        task_id='load_players_to_bq_{version}'.format(version=version),
         bucket='sofifa',
         source_objects=[
-            filename.format(
+            '{entity}/{version}/{current_date_time}.jl'.format(
                 entity='players',
+                version=version,
                 current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
             )
         ],
@@ -200,9 +203,14 @@ get_urls_fifa_20_task, load_urls_fifa_20_to_bq, get_players_fifa_20_task, load_p
 get_urls_fifa_19_task, load_urls_fifa_19_to_bq, get_players_fifa_19_task, load_players_fifa_19_to_bq = \
     _create_tasks_factory('19')
 
-generate_current_date >> \
-    get_versions_task >> load_versions_to_bq >> \
-    [
-        get_urls_fifa_20_task >> load_urls_fifa_20_to_bq >> get_players_fifa_20_task >> load_players_fifa_20_to_bq,
-        get_urls_fifa_19_task >> load_urls_fifa_19_to_bq >> get_players_fifa_19_task >> load_players_fifa_19_to_bq,
-    ]
+generate_current_date >> get_versions_task >> load_versions_to_bq
+
+load_versions_to_bq.set_downstream([get_urls_fifa_20_task, get_urls_fifa_19_task])
+
+get_urls_fifa_20_task.set_downstream(load_urls_fifa_20_to_bq)
+load_urls_fifa_20_to_bq.set_downstream(get_players_fifa_20_task)
+get_players_fifa_20_task.set_downstream(load_players_fifa_20_to_bq)
+
+get_urls_fifa_19_task.set_downstream(load_urls_fifa_19_to_bq)
+load_urls_fifa_19_to_bq.set_downstream(get_players_fifa_19_task)
+get_players_fifa_19_task.set_downstream(load_players_fifa_19_to_bq)
