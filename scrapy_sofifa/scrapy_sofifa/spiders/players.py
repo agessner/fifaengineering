@@ -15,15 +15,6 @@ class PlayersSpider(Spider):
     custom_settings = {
         'ITEM_PIPELINES': {
             'scrapy_sofifa.pipelines.PlayersPipeline': 400
-        },
-        'FEEDS': {
-            'data/players.jl': {
-                'format': 'jsonlines',
-                'store_empty': True,
-                'encoding': 'utf8',
-                'fields': None,
-                'indent': 4
-            }
         }
     }
 
@@ -32,8 +23,7 @@ class PlayersSpider(Spider):
         query = bigquery_connection.query('''
             SELECT 
                 value
-            FROM sofifa.urls WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.urls) 
-            LIMIT 100
+            FROM sofifa.urls WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.urls)
         ''')
         for url in query.result():
             yield Request(url=url['value'])

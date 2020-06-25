@@ -1,6 +1,6 @@
-from scrapy import Spider, Request
+from datetime import datetime
 
-from spiders.players import _convert_date
+from scrapy import Spider, Request
 
 
 class VersionsSpider(Spider):
@@ -9,15 +9,6 @@ class VersionsSpider(Spider):
     custom_settings = {
         'ITEM_PIPELINES': {
             'scrapy_sofifa.pipelines.DefaultPipeline': 400
-        },
-        'FEEDS': {
-            'data/versions.jl': {
-                'format': 'jsonlines',
-                'store_empty': True,
-                'encoding': 'utf8',
-                'fields': None,
-                'indent': 4
-            }
         }
     }
 
@@ -35,6 +26,10 @@ class VersionsSpider(Spider):
 
         if next_page_main_version:
             yield Request('https://sofifa.com{link}'.format(link=next_page_main_version[0]), callback=self.parse)
+
+
+def _convert_date(sofifa_date):
+    return datetime.strptime(sofifa_date, '%b %d, %Y').date() if sofifa_date else ''
 
 
 def get_id_from_version_link(link):

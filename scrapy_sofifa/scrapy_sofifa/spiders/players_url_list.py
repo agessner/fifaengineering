@@ -5,7 +5,7 @@ from scrapy import Spider, Request
 
 SOFIFA_URL = 'https://sofifa.com'
 BASE_URL = 'https://sofifa.com/players?r={version_id}&set=true&offset={offset}'
-LAST_KNOWN_PAGE = 6740
+LAST_KNOWN_PAGE = 5500
 NUMBER_OF_PLAYERS_BY_PAGE = 60
 
 
@@ -14,15 +14,6 @@ class PlayersURLListSpider(Spider):
     custom_settings = {
         'ITEM_PIPELINES': {
             'scrapy_sofifa.pipelines.PlayersURLListPipeline': 400
-        },
-        'FEEDS': {
-            'data/urls.jl': {
-                'format': 'jsonlines',
-                'store_empty': True,
-                'encoding': 'utf8',
-                'fields': None,
-                'indent': 4
-            }
         }
     }
 
@@ -63,7 +54,7 @@ class PlayersURLListSpider(Spider):
             return pagination_links[1].attrib['href']
 
         if int(parse_qs(urlparse(response.url).query)['offset'][0]) < LAST_KNOWN_PAGE:
-            return '&offset=' + str(int(parse_qs(urlparse(response.url).query)['offset'][0]) + NUMBER_OF_PLAYERS_BY_PAGE)
+            return '?r=' + parse_qs(urlparse(response.url).query)['r'][0] + '&set=true&offset=' + str(int(parse_qs(urlparse(response.url).query)['offset'][0]) + NUMBER_OF_PLAYERS_BY_PAGE)
 
         return None
 
