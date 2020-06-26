@@ -6,6 +6,7 @@ gcloud composer environments create fifaeng \
     --env-variables SCRAPY_PATH=/home/airflow/gcs/dags/dependencies/scrapy_sofifa/ \
     --python-version 3 \
     --image-version composer-latest-airflow-1.10.2 \
+    --machine-type n1-standard-4 \
     --service-account dataloader@fifaeng.iam.gserviceaccount.com &&
 gcloud composer environments update fifaeng \
     --update-pypi-packages-from-file requirements_composer.txt \
