@@ -105,6 +105,8 @@ def _create_tasks_factory(version):
         destination_project_dataset_table='fifaeng.sofifa.urls',
         schema_fields=[
             {'name': 'value', 'type': 'STRING', 'mode': 'NULLABLE'},
+            {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+            {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
             {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
         ],
         source_format='NEWLINE_DELIMITED_JSON',
@@ -143,6 +145,8 @@ def _create_tasks_factory(version):
         ],
         destination_project_dataset_table='fifaeng.sofifa.players',
         schema_fields=[
+            {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+            {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
             {'name': 'id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
             {'name': 'full_name', 'type': 'STRING', 'mode': 'NULLABLE'},
             {'name': 'image_url', 'type': 'STRING', 'mode': 'NULLABLE'},
