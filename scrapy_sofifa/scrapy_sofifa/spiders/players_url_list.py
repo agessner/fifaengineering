@@ -24,7 +24,7 @@ class PlayersURLListSpider(Spider):
                 version_id
             FROM sofifa.versions WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.versions)
             AND version_name = "FIFA {version}" 
-            ORDER BY version_id DESC
+            ORDER BY version_id
             LIMIT 1
         '''.format(
             version=self.version
