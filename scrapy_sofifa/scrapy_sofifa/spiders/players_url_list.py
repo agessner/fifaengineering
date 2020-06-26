@@ -3,7 +3,7 @@ from urllib.parse import urlparse, parse_qs
 from google.cloud import bigquery
 from scrapy import Spider, Request
 
-from utils import get_page_version_id
+from spiders.utils import get_page_version_id
 
 SOFIFA_URL = 'https://sofifa.com'
 BASE_URL = 'https://sofifa.com/players?r={version_id}&set=true&offset={offset}'
