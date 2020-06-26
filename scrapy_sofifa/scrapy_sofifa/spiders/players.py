@@ -1,11 +1,10 @@
 import re
 from datetime import datetime, date
 from decimal import Decimal, InvalidOperation
+from urllib.parse import parse_qs, urlparse
 
 from google.cloud import bigquery
 from scrapy import Spider, Request
-
-from scrapy_sofifa.scrapy_sofifa.spiders.utils import get_page_version_id
 
 SOFIFA_URL = 'https://sofifa.com'
 LAST_KNOWN_PAGE = 6740
@@ -251,3 +250,24 @@ def _get_contract_valid_until(response):
     is_a_year = _is_a_number(value)
     return date(int(value), 12, 31) if is_a_year else _convert_date(value)
 
+
+def get_page_version_id(response):
+    main_version_name = response.css('div.dropdown:nth-child(1) > a > span.bp3-button-text::text').get()
+    release_date = response.css('div.dropdown:nth-child(2) > a > span.bp3-button-text::text').get()
+    main_versions = list(zip(
+        response.css('div.dropdown:nth-child(1) > div.bp3-menu > a::attr(href)').getall(),
+        response.css('div.dropdown:nth-child(1) > div.bp3-menu > a::text').getall()
+    ))
+    minor_versions = list(zip(
+        response.css('div.dropdown:nth-child(2) > div.bp3-menu > a::attr(href)').getall(),
+        response.css('div.dropdown:nth-child(2) > div.bp3-menu > a::text').getall()
+    ))
+    for _, name in main_versions:
+        for link, minor_version_release_date in minor_versions:
+            if name == main_version_name and minor_version_release_date == release_date:
+                return get_id_from_version_link(link)
+
+
+def get_id_from_version_link(link):
+    version_link = parse_qs(urlparse(link).query)['r'][0]
+    return version_link
