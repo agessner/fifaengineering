@@ -119,8 +119,8 @@ def _create_tasks_factory(version):
         task_id='get_players_{version}'.format(version=version),
         bash_command="""
             cd {scrapy_path} && 
-            scrapy crawl players -o /tmp/{scrapy_path}data/players.jl -a version={version} && 
-            gsutil mv /tmp/{scrapy_path}data/players.jl {gcs_versions_path}
+            scrapy crawl players -o /tmp/{scrapy_path}{version}data/players.jl -a version={version} && 
+            gsutil mv /tmp/{scrapy_path}{version}data/players.jl {gcs_versions_path}
         """.format(
             scrapy_path=SCRAPY_PATH,
             gcs_versions_path=gcs_path.format(
@@ -218,3 +218,11 @@ get_players_fifa_20_task.set_downstream(load_players_fifa_20_to_bq)
 get_urls_fifa_19_task.set_downstream(load_urls_fifa_19_to_bq)
 load_urls_fifa_19_to_bq.set_downstream(get_players_fifa_19_task)
 get_players_fifa_19_task.set_downstream(load_players_fifa_19_to_bq)
+
+get_urls_fifa_18_task.set_downstream(load_urls_fifa_18_to_bq)
+load_urls_fifa_18_to_bq.set_downstream(get_players_fifa_18_task)
+get_players_fifa_18_task.set_downstream(load_players_fifa_18_to_bq)
+
+get_urls_fifa_17_task.set_downstream(load_urls_fifa_17_to_bq)
+load_urls_fifa_17_to_bq.set_downstream(get_players_fifa_17_task)
+get_players_fifa_17_task.set_downstream(load_players_fifa_17_to_bq)
