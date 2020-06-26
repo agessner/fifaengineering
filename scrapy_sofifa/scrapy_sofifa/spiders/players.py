@@ -26,9 +26,9 @@ class PlayersSpider(Spider):
                 value
             FROM sofifa.urls 
             WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.urls)
-            AND version_name = {version_name}
+            AND version_name = "FIFA {version}" 
         '''.format(
-            version_name='FIFA {version}'.format(version=self.version)
+            version=self.version
         ))
         for url in query.result():
             yield Request(url=url['value'])
