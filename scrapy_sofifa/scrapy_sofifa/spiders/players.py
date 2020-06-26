@@ -25,8 +25,8 @@ class PlayersSpider(Spider):
             SELECT 
                 value
             FROM sofifa.urls 
-            WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.urls)
-            AND version_name = "FIFA {version}" 
+            WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.urls WHERE version_name = "{version}")
+            AND version_name = "{version}" 
         '''.format(
             version=self.version
         ))
