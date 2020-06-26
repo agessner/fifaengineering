@@ -207,9 +207,20 @@ get_urls_fifa_20_task, load_urls_fifa_20_to_bq, get_players_fifa_20_task, load_p
 get_urls_fifa_19_task, load_urls_fifa_19_to_bq, get_players_fifa_19_task, load_players_fifa_19_to_bq = \
     _create_tasks_factory('19')
 
+get_urls_fifa_18_task, load_urls_fifa_18_to_bq, get_players_fifa_18_task, load_players_fifa_18_to_bq = \
+    _create_tasks_factory('18')
+
+get_urls_fifa_17_task, load_urls_fifa_17_to_bq, get_players_fifa_17_task, load_players_fifa_17_to_bq = \
+    _create_tasks_factory('17')
+
 generate_current_date >> get_versions_task >> load_versions_to_bq
 
-load_versions_to_bq.set_downstream([get_urls_fifa_20_task, get_urls_fifa_19_task])
+load_versions_to_bq.set_downstream([
+    get_urls_fifa_20_task,
+    get_urls_fifa_19_task,
+    get_urls_fifa_18_task,
+    get_urls_fifa_17_task
+])
 
 get_urls_fifa_20_task.set_downstream(load_urls_fifa_20_to_bq)
 load_urls_fifa_20_to_bq.set_downstream(get_players_fifa_20_task)
