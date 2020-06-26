@@ -5,6 +5,8 @@ from decimal import Decimal, InvalidOperation
 from google.cloud import bigquery
 from scrapy import Spider, Request
 
+from utils import get_page_version_id
+
 SOFIFA_URL = 'https://sofifa.com'
 LAST_KNOWN_PAGE = 6740
 NUMBER_OF_PLAYERS_BY_PAGE = 60
@@ -23,13 +25,19 @@ class PlayersSpider(Spider):
         query = bigquery_connection.query('''
             SELECT 
                 value
-            FROM sofifa.urls WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.urls)
-        ''')
+            FROM sofifa.urls 
+            WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.urls)
+            AND version_name = {version_name}
+        '''.format(
+            version_name='FIFA {version}'.format(version=self.version)
+        ))
         for url in query.result():
             yield Request(url=url['value'])
 
     def parse(self, response):
         yield {
+            'version_id': get_page_version_id(response),
+            'version_name': self.version,
             'full_name': response.css('div.player .info > h1::text').get().split('(')[0].strip(),
             'id': int(re.findall('[0-9]+', response.css('div.player .info > h1::text').get())[0]),
             'image_url': response.css('div.player > img').attrib['data-src'],

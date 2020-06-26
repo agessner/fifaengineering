@@ -23,6 +23,7 @@ class PlayersURLListTests(TestCase):
         self.page_without_next_but_not_last_file.close()
 
     def test_return_the_url_of_the_first_player(self):
+        self.spider.version = 'Fifa 20'
         urls = list(self.spider.parse(HtmlResponse(
             url='http://teste.com?offset=0',
             request=scrapy.Request(url='http://teste.com?offset=0'),
@@ -32,6 +33,8 @@ class PlayersURLListTests(TestCase):
 
         self.assertEqual(61, len(urls))
         self.assertEqual('https://sofifa.com/player/226807/cristian-roldan/200044/', urls[0]['url'])
+        self.assertEqual('200044', urls[0]['version_id'])
+        self.assertEqual('Fifa 20', urls[0]['version_name'])
 
     @patch('scrapy_sofifa.scrapy_sofifa.spiders.players_url_list.Request')
     def test_create_the_next_request_when_it_has_the_next_link_and_is_the_first_page(self, request_mock):
