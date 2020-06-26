@@ -32,7 +32,7 @@ class PlayersURLListTests(TestCase):
         )))
 
         self.assertEqual(61, len(urls))
-        self.assertEqual('https://sofifa.com/player/226807/cristian-roldan/200044/', urls[0]['url'])
+        self.assertEqual('https://sofifa.com/player/226807/cristian-roldan/200044/', urls[0]['value'])
         self.assertEqual('200044', urls[0]['version_id'])
         self.assertEqual('Fifa 20', urls[0]['version_name'])
 
