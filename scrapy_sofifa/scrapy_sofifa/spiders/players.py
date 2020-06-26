@@ -16,7 +16,7 @@ class PlayersSpider(Spider):
     name = 'players'
     custom_settings = {
         'ITEM_PIPELINES': {
-            'scrapy_sofifa.pipelines.PlayersPipeline': 400
+            'scrapy_sofifa.pipelines.DefaultPipeline': 400
         }
     }
 

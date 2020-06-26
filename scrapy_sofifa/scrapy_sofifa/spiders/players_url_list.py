@@ -15,7 +15,7 @@ class PlayersURLListSpider(Spider):
     name = 'players_url_list'
     custom_settings = {
         'ITEM_PIPELINES': {
-            'scrapy_sofifa.pipelines.PlayersURLListPipeline': 400
+            'scrapy_sofifa.pipelines.DefaultPipeline': 400
         }
     }
 
