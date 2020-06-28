@@ -9,6 +9,20 @@ from airflow.operators.python_operator import PythonOperator
 from airflow.utils.dates import days_ago
 
 SCRAPY_PATH = os.environ.get('SCRAPY_PATH', '/Users/airtongessner/projetos/fifaengineering/scrapy_sofifa/')
+VERSIONS_BQ_SCHEMA = [
+    {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
+    {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+    {'name': 'release_date', 'type': 'DATE', 'mode': 'NULLABLE'},
+    {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
+]
+URLS_BQ_SCHEMA = [
+    {'name': 'value', 'type': 'STRING', 'mode': 'NULLABLE'},
+    {'name': 'player_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+    {'name': 'player_nickname', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+    {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
+    {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
+]
 PLAYERS_BQ_SCHEMA = [
     {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
     {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
@@ -77,107 +91,94 @@ generate_current_date = PythonOperator(
 )
 
 
-get_versions_task = BashOperator(
-    task_id='get_versions',
-    bash_command="""
-        cd {scrapy_path} && 
-        scrapy crawl versions -o /tmp/{scrapy_path}data/versions.jl && 
-        gsutil mv /tmp/{scrapy_path}data/versions.jl {gcs_versions_path}
-    """.format(
+SCRAPY_BASE_COMMAND = """
+    cd {scrapy_path} && 
+    scrapy crawl versions -o /tmp/{scrapy_path}data/{entity}.jl && 
+    gsutil mv /tmp/{scrapy_path}data/{entity}.jl {gcs_versions_path}
+"""
+
+
+def get_scrapy_command(entity):
+    return SCRAPY_BASE_COMMAND.format(
         scrapy_path=SCRAPY_PATH,
+        entity=entity,
         gcs_versions_path='gs://sofifa/{entity}/{current_date_time}.jl'.format(
             entity='versions',
             current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
         )
-    ),
-    dag=dag
-)
+    )
 
+
+def get_source_gcs_path(entity):
+    return '{entity}/{current_date_time}.jl'.format(
+        entity=entity,
+        current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
+    )
+
+
+get_versions_task = BashOperator(task_id='get_versions', bash_command=get_scrapy_command('versions'), dag=dag)
+
+
+DEFAULT_GCS_TO_BQ_CONFIG = {
+    'bucket': 'sofifa',
+    'source_format': 'NEWLINE_DELIMITED_JSON',
+    'bigquery_conn_id': 'google_cloud_default',
+    'write_disposition': 'WRITE_APPEND',
+    'dag': dag
+}
 
 load_versions_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id='load_versions_to_bq',
-    bucket='sofifa',
-    source_objects=[
-        '{entity}/{current_date_time}.jl'.format(
-            entity='versions',
-            current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
-        )
-    ],
+    source_objects=[get_source_gcs_path('versions')],
     destination_project_dataset_table='fifaeng.sofifa.versions',
-    schema_fields=[
-        {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
-        {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-        {'name': 'release_date', 'type': 'DATE', 'mode': 'NULLABLE'},
-        {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
-    ],
-    source_format='NEWLINE_DELIMITED_JSON',
-    bigquery_conn_id='google_cloud_default',
-    write_disposition='WRITE_APPEND',
-    dag=dag
+    schema_fields=VERSIONS_BQ_SCHEMA,
+    **DEFAULT_GCS_TO_BQ_CONFIG
 )
 
 
-def _create_tasks(version):
+def create_tasks_for_version(version):
     gcs_file_path = 'gs://sofifa/{entity}/{version}/{current_date_time}.jl'
     file_path = '{entity}/{version}/{current_date_time}.jl'
-    get_urls_task = BashOperator(
-        task_id='get_urls_{version}'.format(version=version),
-        bash_command="""
+
+    def get_bash_command(entity):
+        return """
             cd {scrapy_path} && 
             scrapy crawl players_url_list -o /tmp/{scrapy_path}{version}/data/urls.jl -a version={version} && 
             gsutil mv /tmp/{scrapy_path}{version}/data/urls.jl {gcs_versions_path}
         """.format(
             scrapy_path=SCRAPY_PATH,
             gcs_versions_path=gcs_file_path.format(
-                entity='urls',
+                entity=entity,
                 version=version,
                 current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
             ),
             version=version
-        ),
+        )
+
+    get_urls_task = BashOperator(
+        task_id='get_urls_{version}'.format(version=version),
+        bash_command=get_bash_command('urls'),
         dag=dag
     )
     load_urls_to_bq_task = GoogleCloudStorageToBigQueryOperator(
         task_id='load_urls_to_bq_{version}'.format(version=version),
-        bucket='sofifa', source_objects=[
+        source_objects=[
             file_path.format(
                 entity='urls',
                 version=version,
                 current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}")
         ],
         destination_project_dataset_table='fifaeng.sofifa.urls',
-        schema_fields=[
-            {'name': 'value', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'player_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'player_nickname', 'type': 'INTEGER', 'mode': 'NULLABLE'},
-            {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
-            {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}],
-        source_format='NEWLINE_DELIMITED_JSON',
-        bigquery_conn_id='google_cloud_default',
-        write_disposition='WRITE_APPEND',
-        dag=dag
+        schema_fields=URLS_BQ_SCHEMA,
+        **DEFAULT_GCS_TO_BQ_CONFIG
     )
     get_players_task = BashOperator(
         task_id='get_players_{version}'.format(version=version),
-        bash_command="""
-            cd {scrapy_path} && 
-            scrapy crawl players -o /tmp/{scrapy_path}{version}data/players.jl -a version={version} && 
-            gsutil mv /tmp/{scrapy_path}{version}data/players.jl {gcs_versions_path}
-        """.format(
-            scrapy_path=SCRAPY_PATH,
-            gcs_versions_path=gcs_file_path.format(
-                entity='players',
-                version=version,
-                current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
-            ),
-            version=version
-        ),
+        bash_command=get_bash_command('players'),
         dag=dag
     )
     load_players_to_bq_task = GoogleCloudStorageToBigQueryOperator(
         task_id='load_players_to_bq_{version}'.format(version=version),
-        bucket='sofifa',
         source_objects=[
             file_path.format(
                 entity='players',
@@ -187,10 +188,7 @@ def _create_tasks(version):
         ],
         destination_project_dataset_table='fifaeng.sofifa.players',
         schema_fields=PLAYERS_BQ_SCHEMA,
-        source_format='NEWLINE_DELIMITED_JSON',
-        bigquery_conn_id='google_cloud_default',
-        write_disposition='WRITE_APPEND',
-        dag=dag
+        **DEFAULT_GCS_TO_BQ_CONFIG
     )
     load_versions_to_bq.set_downstream(get_urls_task)
     get_urls_task.set_downstream(load_urls_to_bq_task)
@@ -201,7 +199,5 @@ def _create_tasks(version):
 
 generate_current_date >> get_versions_task >> load_versions_to_bq
 
-_create_tasks('20')
-_create_tasks('19')
-_create_tasks('18')
-_create_tasks('17')
+for i in range(7, 21):
+    create_tasks_for_version('0' + str(i) if i < 10 else str(i))
