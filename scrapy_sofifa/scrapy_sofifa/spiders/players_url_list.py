@@ -17,6 +17,10 @@ class PlayersURLListSpider(Spider):
         }
     }
 
+    def __init__(self, version=None, *args, **kwargs):
+        super(PlayersURLListSpider, self).__init__(*args, **kwargs)
+        self.version = version
+
     def start_requests(self):
         bigquery_connection = bigquery.Client(project='fifaeng')
         query = bigquery_connection.query('''

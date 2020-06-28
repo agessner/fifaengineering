@@ -11,8 +11,7 @@ from spiders.players import PlayersSpider
 
 class PlayersURLListTests(TestCase):
     def setUp(self):
-        self.spider = PlayersSpider()
-        self.spider.version = ''
+        self.spider = PlayersSpider(version='Fifa 20')
         self.partial_html_response = partial(
             HtmlResponse,
             url='http://test.com',
@@ -27,7 +26,6 @@ class PlayersURLListTests(TestCase):
         self.assertEqual('200048', player['version_id'])
 
     def test_version_name(self):
-        self.spider.version = 'Fifa 20'
         with open('test_pages/players/test_messi.htm', 'r') as page:
             player = next(self.spider.parse(self.partial_html_response(body=page.read())))
 

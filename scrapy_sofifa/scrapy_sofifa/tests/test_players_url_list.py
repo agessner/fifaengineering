@@ -10,7 +10,7 @@ from spiders.players_url_list import LAST_KNOWN_PAGE
 
 class PlayersURLListTests(TestCase):
     def setUp(self):
-        self.spider = PlayersURLListSpider()
+        self.spider = PlayersURLListSpider(version='Fifa 20')
         self.first_page_file = open('test_pages/test_first_page.htm', 'r')
         self.second_page_file = open('test_pages/test_second_page.htm', 'r')
         self.last_page_file = open('test_pages/test_last_page.htm', 'r')
@@ -23,10 +23,9 @@ class PlayersURLListTests(TestCase):
         self.page_without_next_but_not_last_file.close()
 
     def test_return_the_url_of_the_first_player(self):
-        self.spider.version = 'Fifa 20'
         urls = list(self.spider.parse(HtmlResponse(
-            url='http://teste.com?offset=0',
-            request=scrapy.Request(url='http://teste.com?offset=0'),
+            url='http://teste.com?offset=0&r=10',
+            request=scrapy.Request(url='http://teste.com?offset=0&r=10'),
             body=self.first_page_file.read(),
             encoding='utf-8'
         )))
