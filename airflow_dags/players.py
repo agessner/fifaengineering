@@ -136,6 +136,7 @@ load_versions_to_bq = GoogleCloudStorageToBigQueryOperator(
 )
 
 create_versions_bq_table = BigQueryOperator(
+    task_id='create_versions_bq_table',
     sql="""
         SELECT * FROM `fifaeng.staging.versions` WHERE processed_at = (
             SELECT MAX(processed_at) FROM `fifaeng.staging.versions`
@@ -143,7 +144,8 @@ create_versions_bq_table = BigQueryOperator(
     """,
     destination_dataset_table='fifaeng.sofifa.versions',
     write_disposition='WRITE_TRUNCATE',
-    bigquery_conn_id='google_cloud_default'
+    bigquery_conn_id='google_cloud_default',
+    dag=dag
 )
 
 
@@ -184,6 +186,7 @@ def create_tasks_for_version(version):
         **DEFAULT_GCS_TO_BQ_CONFIG
     )
     create_urls_bq_table = BigQueryOperator(
+        task_id='create_urls_bq_table',
         sql="""
             SELECT * FROM `fifaeng.staging.urls` WHERE processed_at = (
                 SELECT MAX(processed_at) FROM `fifaeng.staging.urls` AND version_name = "{version}"
@@ -191,7 +194,8 @@ def create_tasks_for_version(version):
         """.format(version=version),
         destination_dataset_table='fifaeng.sofifa.urls_{version}'.format(version=version),
         write_disposition='WRITE_TRUNCATE',
-        bigquery_conn_id='google_cloud_default'
+        bigquery_conn_id='google_cloud_default',
+        dag=dag
     )
     get_players_task = BashOperator(
         task_id='get_players_{version}'.format(version=version),
@@ -212,6 +216,7 @@ def create_tasks_for_version(version):
         **DEFAULT_GCS_TO_BQ_CONFIG
     )
     create_players_bq_table = BigQueryOperator(
+        task_id='create_players_bq_table',
         sql="""
             SELECT * FROM `fifaeng.staging.players` WHERE processed_at = (
                 SELECT MAX(processed_at) FROM `fifaeng.staging.players` AND version_name = "{version}"
@@ -219,7 +224,8 @@ def create_tasks_for_version(version):
         """.format(version=version),
         destination_dataset_table='fifaeng.sofifa.players_{version}'.format(version=version),
         write_disposition='WRITE_TRUNCATE',
-        bigquery_conn_id='google_cloud_default'
+        bigquery_conn_id='google_cloud_default',
+        dag=dag
     )
     create_versions_bq_table.set_downstream(get_urls_task)
     get_urls_task.set_downstream(load_urls_to_bq_task)
