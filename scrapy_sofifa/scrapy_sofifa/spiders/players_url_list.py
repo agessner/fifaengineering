@@ -48,6 +48,8 @@ class PlayersURLListSpider(Spider):
                     sofifa_url=SOFIFA_URL,
                     player_url=row.css('td.col-name')[0].css('a::attr(href)').get()
                 ),
+                'player_id': int(row.css('td.col-name')[0].css('a::attr(href)').get().split('/')[2]),
+                'player_nickname': [name.strip() for name in row.css('td.col-name a div::text').getall() if name.strip()][0],
                 'version_id': utils.get_page_version_id(response),
                 'version_name': self.version
             }

@@ -4,8 +4,7 @@ from unittest.mock import patch
 import scrapy
 from scrapy.http import HtmlResponse
 
-from scrapy_sofifa.scrapy_sofifa.spiders.players_url_list import PlayersURLListSpider
-from spiders.players_url_list import LAST_KNOWN_PAGE
+from scrapy_sofifa.spiders.players_url_list import PlayersURLListSpider, LAST_KNOWN_PAGE
 
 
 class PlayersURLListTests(TestCase):
@@ -22,7 +21,7 @@ class PlayersURLListTests(TestCase):
         self.last_page_file.close()
         self.page_without_next_but_not_last_file.close()
 
-    def test_return_the_url_of_the_first_player(self):
+    def test_return_the_first_player(self):
         urls = list(self.spider.parse(HtmlResponse(
             url='http://teste.com?offset=0&r=10',
             request=scrapy.Request(url='http://teste.com?offset=0&r=10'),
@@ -32,10 +31,12 @@ class PlayersURLListTests(TestCase):
 
         self.assertEqual(61, len(urls))
         self.assertEqual('https://sofifa.com/player/226807/cristian-roldan/200044/', urls[0]['value'])
+        self.assertEqual(226807, urls[0]['player_id'])
+        self.assertEqual('C. Roldan', urls[0]['player_nickname'])
         self.assertEqual('200044', urls[0]['version_id'])
         self.assertEqual('Fifa 20', urls[0]['version_name'])
 
-    @patch('scrapy_sofifa.scrapy_sofifa.spiders.players_url_list.Request')
+    @patch('scrapy_sofifa.spiders.players_url_list.Request')
     def test_create_the_next_request_when_it_has_the_next_link_and_is_the_first_page(self, request_mock):
         list(self.spider.parse(HtmlResponse(
             url='http://teste.com?offset=0',
@@ -46,7 +47,7 @@ class PlayersURLListTests(TestCase):
 
         request_mock.assert_called_once_with('http://teste.com/?offset=60', callback=self.spider.parse)
 
-    @patch('scrapy_sofifa.scrapy_sofifa.spiders.players_url_list.Request')
+    @patch('scrapy_sofifa.spiders.players_url_list.Request')
     def test_create_the_next_request_when_it_has_the_next_link_and_is_the_second_page(self, request_mock):
         list(self.spider.parse(HtmlResponse(
             url='http://teste.com?offset=0',
@@ -57,7 +58,7 @@ class PlayersURLListTests(TestCase):
 
         request_mock.assert_called_once_with('http://teste.com/?offset=120', callback=self.spider.parse)
 
-    @patch('scrapy_sofifa.scrapy_sofifa.spiders.players_url_list.Request')
+    @patch('scrapy_sofifa.spiders.players_url_list.Request')
     def test_create_the_next_request_when_it_has_not_the_next_link_but_its_not_the_last_known_page(self, request_mock):
         list(self.spider.parse(HtmlResponse(
             url='http://teste.com?offset=60&r=10',
@@ -68,7 +69,7 @@ class PlayersURLListTests(TestCase):
 
         request_mock.assert_called_once_with('http://teste.com?r=10&set=true&offset=120', callback=self.spider.parse)
 
-    @patch('scrapy_sofifa.scrapy_sofifa.spiders.players_url_list.Request')
+    @patch('scrapy_sofifa.spiders.players_url_list.Request')
     def test_doesnt_create_the_next_request_when_it_is_the_last_page(self, request_mock):
         list(self.spider.parse(HtmlResponse(
             url='http://teste.com?offset={last_page}'.format(last_page=LAST_KNOWN_PAGE),

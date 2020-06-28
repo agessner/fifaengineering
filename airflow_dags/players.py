@@ -148,6 +148,8 @@ def _create_tasks(version):
         destination_project_dataset_table='fifaeng.sofifa.urls',
         schema_fields=[
             {'name': 'value', 'type': 'STRING', 'mode': 'NULLABLE'},
+            {'name': 'player_id', 'type': 'STRING', 'mode': 'NULLABLE'},
+            {'name': 'player_nickname', 'type': 'INTEGER', 'mode': 'NULLABLE'},
             {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
             {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
             {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}],
