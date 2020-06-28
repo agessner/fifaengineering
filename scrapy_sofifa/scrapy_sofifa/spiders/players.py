@@ -1,3 +1,4 @@
+import logging
 import re
 from datetime import datetime, date
 from decimal import Decimal, InvalidOperation
@@ -27,10 +28,14 @@ class PlayersSpider(Spider):
     def start_requests(self):
         bigquery_connection = bigquery.Client(project='fifaeng')
         query = bigquery_connection.query('SELECT value FROM sofifa.urls_{version}'.format(version=self.version))
+        counter = 0
         for url in query.result():
-            yield Request(url=url['value'])
+            counter = counter + 1
+            logging.info("creating url number {counter}".format(counter=str(counter)))
+            yield Request(url=url['value'], meta={'counter': counter})
 
     def parse(self, response):
+        logging.info("parsing player number {counter}".format(counter=str(response.meta['counter'])))
         yield {
             'version_id': utils.get_page_version_id(response),
             'version_name': self.version,
