@@ -60,13 +60,13 @@ class PlayersURLListTests(TestCase):
     @patch('scrapy_sofifa.scrapy_sofifa.spiders.players_url_list.Request')
     def test_create_the_next_request_when_it_has_not_the_next_link_but_its_not_the_last_known_page(self, request_mock):
         list(self.spider.parse(HtmlResponse(
-            url='http://teste.com?offset=60',
-            request=scrapy.Request(url='http://teste.com?offset=60'),
+            url='http://teste.com?offset=60&r=10',
+            request=scrapy.Request(url='http://teste.com?offset=60&r=10'),
             body=self.page_without_next_but_not_last_file.read(),
             encoding='utf-8'
         )))
 
-        request_mock.assert_called_once_with('http://teste.com/?offset=120', callback=self.spider.parse)
+        request_mock.assert_called_once_with('http://teste.com?r=10&set=true&offset=120', callback=self.spider.parse)
 
     @patch('scrapy_sofifa.scrapy_sofifa.spiders.players_url_list.Request')
     def test_doesnt_create_the_next_request_when_it_is_the_last_page(self, request_mock):
