@@ -1,8 +1,8 @@
 import os
-from datetime import timedelta, date, datetime
+from datetime import timedelta, datetime
 
 from airflow import DAG
-from airflow.contrib.operators.file_to_gcs import FileToGoogleCloudStorageOperator
+from airflow.contrib.operators.bigquery_operator import BigQueryOperator
 from airflow.contrib.operators.gcs_to_bq import GoogleCloudStorageToBigQueryOperator
 from airflow.operators.bash_operator import BashOperator
 from airflow.operators.python_operator import PythonOperator
@@ -130,9 +130,20 @@ DEFAULT_GCS_TO_BQ_CONFIG = {
 load_versions_to_bq = GoogleCloudStorageToBigQueryOperator(
     task_id='load_versions_to_bq',
     source_objects=[get_source_gcs_path('versions')],
-    destination_project_dataset_table='fifaeng.sofifa.versions',
+    destination_project_dataset_table='fifaeng.staging.versions',
     schema_fields=VERSIONS_BQ_SCHEMA,
     **DEFAULT_GCS_TO_BQ_CONFIG
+)
+
+create_versions_bq_table = BigQueryOperator(
+    sql="""
+        SELECT * FROM `fifaeng.staging.versions` WHERE processed_at = (
+            SELECT MAX(processed_at) FROM `fifaeng.staging.versions`
+        )
+    """,
+    destination_dataset_table='fifaeng.sofifa.versions',
+    write_disposition='WRITE_TRUNCATE',
+    bigquery_conn_id='google_cloud_default'
 )
 
 
@@ -168,9 +179,19 @@ def create_tasks_for_version(version):
                 version=version,
                 current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}")
         ],
-        destination_project_dataset_table='fifaeng.sofifa.urls',
+        destination_project_dataset_table='fifaeng.staging.urls',
         schema_fields=URLS_BQ_SCHEMA,
         **DEFAULT_GCS_TO_BQ_CONFIG
+    )
+    create_urls_bq_table = BigQueryOperator(
+        sql="""
+            SELECT * FROM `fifaeng.staging.urls` WHERE processed_at = (
+                SELECT MAX(processed_at) FROM `fifaeng.staging.urls` AND version_name = "{version}"
+            ) AND version_name = "{version}"
+        """.format(version=version),
+        destination_dataset_table='fifaeng.sofifa.urls_{version}'.format(version=version),
+        write_disposition='WRITE_TRUNCATE',
+        bigquery_conn_id='google_cloud_default'
     )
     get_players_task = BashOperator(
         task_id='get_players_{version}'.format(version=version),
@@ -186,18 +207,30 @@ def create_tasks_for_version(version):
                 current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
             )
         ],
-        destination_project_dataset_table='fifaeng.sofifa.players',
+        destination_project_dataset_table='fifaeng.staging.players',
         schema_fields=PLAYERS_BQ_SCHEMA,
         **DEFAULT_GCS_TO_BQ_CONFIG
     )
-    load_versions_to_bq.set_downstream(get_urls_task)
+    create_players_bq_table = BigQueryOperator(
+        sql="""
+            SELECT * FROM `fifaeng.staging.players` WHERE processed_at = (
+                SELECT MAX(processed_at) FROM `fifaeng.staging.players` AND version_name = "{version}"
+            ) AND version_name = "{version}"
+        """.format(version=version),
+        destination_dataset_table='fifaeng.sofifa.players_{version}'.format(version=version),
+        write_disposition='WRITE_TRUNCATE',
+        bigquery_conn_id='google_cloud_default'
+    )
+    create_versions_bq_table.set_downstream(get_urls_task)
     get_urls_task.set_downstream(load_urls_to_bq_task)
-    load_urls_to_bq_task.set_downstream(get_players_task)
-    get_players_task.set_downstream(load_players_to_bq_task)
+    load_urls_to_bq_task.set_downstream(create_urls_bq_table)
+    create_urls_bq_table.set_downstream(get_players_task)
+    get_players_task.set_downstream(create_players_bq_table)
+    create_players_bq_table.set_downstream(load_players_to_bq_task)
     return get_urls_task, load_urls_to_bq_task, get_players_task, load_players_to_bq_task
 
 
-generate_current_date >> get_versions_task >> load_versions_to_bq
+generate_current_date >> get_versions_task >> load_versions_to_bq >> create_versions_bq_table
 
 for i in range(7, 21):
     create_tasks_for_version('0' + str(i) if i < 10 else str(i))
