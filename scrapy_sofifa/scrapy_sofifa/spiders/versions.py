@@ -2,6 +2,8 @@ from datetime import datetime
 
 from scrapy import Spider, Request
 
+import utils
+
 
 class VersionsSpider(Spider):
     name = 'versions'
@@ -20,7 +22,7 @@ class VersionsSpider(Spider):
         ):
             yield {
                 'version_name': current_page_main_version[1],
-                'version_id': get_id_from_version_link(link),
+                'version_id': utils.get_id_from_version_link(link),
                 'release_date': _convert_date(release_date)
             }
 
@@ -30,10 +32,6 @@ class VersionsSpider(Spider):
 
 def _convert_date(sofifa_date):
     return datetime.strptime(sofifa_date, '%b %d, %Y').date() if sofifa_date else ''
-
-
-def get_id_from_version_link(link):
-    return link.replace('/players?r=', '').replace('&set=true', '')
 
 
 def get_current_and_next_page_main_versions(response):
