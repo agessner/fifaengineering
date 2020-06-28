@@ -26,15 +26,7 @@ class PlayersSpider(Spider):
 
     def start_requests(self):
         bigquery_connection = bigquery.Client(project='fifaeng')
-        query = bigquery_connection.query('''
-            SELECT 
-                value
-            FROM sofifa.urls 
-            WHERE processed_at = (SELECT MAX(processed_at) FROM sofifa.urls WHERE version_name = "{version}")
-            AND version_name = "{version}" 
-        '''.format(
-            version=self.version
-        ))
+        query = bigquery_connection.query('SELECT value FROM sofifa.urls_{version}'.format(version=self.version))
         for url in query.result():
             yield Request(url=url['value'])
 
