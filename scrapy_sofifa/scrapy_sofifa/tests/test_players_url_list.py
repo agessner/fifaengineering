@@ -1,3 +1,4 @@
+from functools import partial
 from unittest import TestCase
 from unittest.mock import patch
 
@@ -10,24 +11,16 @@ from scrapy_sofifa.spiders.players_url_list import PlayersURLListSpider, LAST_KN
 class PlayersURLListTests(TestCase):
     def setUp(self):
         self.spider = PlayersURLListSpider(version='Fifa 20')
-        self.first_page_file = open('test_pages/test_first_page.htm', 'r')
-        self.second_page_file = open('test_pages/test_second_page.htm', 'r')
-        self.last_page_file = open('test_pages/test_last_page.htm', 'r')
-        self.page_without_next_but_not_last_file = open('test_pages/test_page_without_next_but_not_last.htm', 'r')
-
-    def tearDown(self):
-        self.first_page_file.close()
-        self.second_page_file.close()
-        self.last_page_file.close()
-        self.page_without_next_but_not_last_file.close()
+        self.partial_html_response = partial(
+            HtmlResponse,
+            url='http://teste.com?offset=60&r=10',
+            request=scrapy.Request(url='http://teste.com?offset=60&r=10'),
+            encoding='utf-8'
+        )
 
     def test_return_the_first_player(self):
-        urls = list(self.spider.parse(HtmlResponse(
-            url='http://teste.com?offset=0&r=10',
-            request=scrapy.Request(url='http://teste.com?offset=0&r=10'),
-            body=self.first_page_file.read(),
-            encoding='utf-8'
-        )))
+        with open('test_pages/urls/test_first_page.htm', 'r') as file:
+            urls = list(self.spider.parse(self.partial_html_response(body=file.read())))
 
         self.assertEqual(61, len(urls))
         self.assertEqual('https://sofifa.com/player/226807/cristian-roldan/200044/', urls[0]['value'])
@@ -38,44 +31,33 @@ class PlayersURLListTests(TestCase):
 
     @patch('scrapy_sofifa.spiders.players_url_list.Request')
     def test_create_the_next_request_when_it_has_the_next_link_and_is_the_first_page(self, request_mock):
-        list(self.spider.parse(HtmlResponse(
-            url='http://teste.com?offset=0',
-            request=scrapy.Request(url='http://teste.com?offset=0'),
-            body=self.first_page_file.read(),
-            encoding='utf-8'
-        )))
+        with open('test_pages/urls/test_first_page.htm', 'r') as file:
+            list(self.spider.parse(self.partial_html_response(body=file.read())))
 
         request_mock.assert_called_once_with('http://teste.com/?offset=60', callback=self.spider.parse)
 
     @patch('scrapy_sofifa.spiders.players_url_list.Request')
     def test_create_the_next_request_when_it_has_the_next_link_and_is_the_second_page(self, request_mock):
-        list(self.spider.parse(HtmlResponse(
-            url='http://teste.com?offset=0',
-            request=scrapy.Request(url='http://teste.com?offset=0'),
-            body=self.second_page_file.read(),
-            encoding='utf-8'
-        )))
+        with open('test_pages/urls/test_second_page.htm', 'r') as file:
+            list(self.spider.parse(self.partial_html_response(body=file.read())))
 
         request_mock.assert_called_once_with('http://teste.com/?offset=120', callback=self.spider.parse)
 
     @patch('scrapy_sofifa.spiders.players_url_list.Request')
     def test_create_the_next_request_when_it_has_not_the_next_link_but_its_not_the_last_known_page(self, request_mock):
-        list(self.spider.parse(HtmlResponse(
-            url='http://teste.com?offset=60&r=10',
-            request=scrapy.Request(url='http://teste.com?offset=60&r=10'),
-            body=self.page_without_next_but_not_last_file.read(),
-            encoding='utf-8'
-        )))
+        with open('test_pages/urls/test_page_without_next_but_not_last.htm', 'r') as file:
+            list(self.spider.parse(self.partial_html_response(body=file.read())))
 
         request_mock.assert_called_once_with('http://teste.com?r=10&set=true&offset=120', callback=self.spider.parse)
 
     @patch('scrapy_sofifa.spiders.players_url_list.Request')
     def test_doesnt_create_the_next_request_when_it_is_the_last_page(self, request_mock):
-        list(self.spider.parse(HtmlResponse(
-            url='http://teste.com?offset={last_page}'.format(last_page=LAST_KNOWN_PAGE),
-            request=scrapy.Request(url='http://teste.com?offset={last_page}'.format(last_page=LAST_KNOWN_PAGE)),
-            body=self.last_page_file.read(),
-            encoding='utf-8'
-        )))
+        with open('test_pages/urls/test_last_page.htm', 'r') as file:
+            list(self.spider.parse(HtmlResponse(
+                url='http://teste.com?offset={last_page}'.format(last_page=LAST_KNOWN_PAGE),
+                request=scrapy.Request(url='http://teste.com?offset={last_page}'.format(last_page=LAST_KNOWN_PAGE)),
+                body=file.read(),
+                encoding='utf-8'
+            )))
 
         request_mock.assert_not_called()
