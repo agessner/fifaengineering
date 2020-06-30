@@ -190,7 +190,7 @@ def create_tasks_for_version(version):
     create_urls_bq_table = BigQueryOperator(
         task_id='create_urls_bq_table_{version}'.format(version=version),
         sql="""
-            SELECT * FROM fifaeng.staging.urls WHERE processed_at = (
+            SELECT DISTINCT * FROM fifaeng.staging.urls WHERE processed_at = (
                 SELECT MAX(processed_at) FROM fifaeng.staging.urls WHERE version_name = "{version}"
             ) AND version_name = "{version}"
         """.format(version=version),
