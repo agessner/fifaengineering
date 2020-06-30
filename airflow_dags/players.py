@@ -138,8 +138,8 @@ load_versions_to_bq = GoogleCloudStorageToBigQueryOperator(
 create_versions_bq_table = BigQueryOperator(
     task_id='create_versions_bq_table',
     sql="""
-        SELECT * FROM `fifaeng.staging.versions` WHERE processed_at = (
-            SELECT MAX(processed_at) FROM `fifaeng.staging.versions`
+        SELECT * FROM fifaeng.staging.versions WHERE processed_at = (
+            SELECT MAX(processed_at) FROM fifaeng.staging.versions
         )
     """,
     destination_dataset_table='fifaeng.sofifa.versions',
@@ -188,14 +188,15 @@ def create_tasks_for_version(version):
     create_urls_bq_table = BigQueryOperator(
         task_id='create_urls_bq_table',
         sql="""
-            SELECT * FROM `fifaeng.staging.urls` WHERE processed_at = (
-                SELECT MAX(processed_at) FROM `fifaeng.staging.urls` AND version_name = "{version}"
+            SELECT * FROM fifaeng.staging.urls WHERE processed_at = (
+                SELECT MAX(processed_at) FROM fifaeng.staging.urls WHERE version_name = "{version}"
             ) AND version_name = "{version}"
         """.format(version=version),
         destination_dataset_table='fifaeng.sofifa.urls_{version}'.format(version=version),
         write_disposition='WRITE_TRUNCATE',
         bigquery_conn_id='google_cloud_default',
-        dag=dag
+        dag=dag,
+        use_legacy_sql=False
     )
     get_players_task = BashOperator(
         task_id='get_players_{version}'.format(version=version),
@@ -218,14 +219,15 @@ def create_tasks_for_version(version):
     create_players_bq_table = BigQueryOperator(
         task_id='create_players_bq_table',
         sql="""
-            SELECT * FROM `fifaeng.staging.players` WHERE processed_at = (
-                SELECT MAX(processed_at) FROM `fifaeng.staging.players` AND version_name = "{version}"
+            SELECT * FROM fifaeng.staging.players WHERE processed_at = (
+                SELECT MAX(processed_at) FROM fifaeng.staging.players WHERE version_name = "{version}"
             ) AND version_name = "{version}"
         """.format(version=version),
         destination_dataset_table='fifaeng.sofifa.players_{version}'.format(version=version),
         write_disposition='WRITE_TRUNCATE',
         bigquery_conn_id='google_cloud_default',
-        dag=dag
+        dag=dag,
+        use_legacy_sql=False
     )
     create_versions_bq_table.set_downstream(get_urls_task)
     get_urls_task.set_downstream(load_urls_to_bq_task)
