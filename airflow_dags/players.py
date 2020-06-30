@@ -172,7 +172,7 @@ def create_tasks_for_version(version):
 
     get_urls_task = BashOperator(
         task_id='get_urls_{version}'.format(version=version),
-        bash_command=get_bash_command('urls', 'plauers_url_list'),
+        bash_command=get_bash_command('urls', 'players_url_list'),
         dag=dag
     )
     load_urls_to_bq_task = GoogleCloudStorageToBigQueryOperator(
