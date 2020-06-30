@@ -76,7 +76,7 @@ dag = DAG(
     'players',
     description='Populate the players data on BQ',
     start_date=days_ago(1),
-    schedule_interval=timedelta(hours=12),
+    schedule_interval=timedelta(hours=24),
     default_args={
         'depends_on_past': True,
         'wait_for_downstream': True
