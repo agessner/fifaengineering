@@ -153,11 +153,11 @@ def create_tasks_for_version(version):
     gcs_file_path = 'gs://sofifa/{entity}/{version}/{current_date_time}.jl'
     file_path = '{entity}/{version}/{current_date_time}.jl'
 
-    def get_bash_command(entity):
+    def get_bash_command(entity, crawler):
         return """
             cd {scrapy_path} && 
-            scrapy crawl players_url_list -o /tmp/{scrapy_path}{version}/data/urls.jl -a version={version} && 
-            gsutil mv /tmp/{scrapy_path}{version}/data/urls.jl {gcs_versions_path}
+            scrapy crawl {crawler} -o /tmp/{scrapy_path}{version}/data/{entity}.jl -a version={version} && 
+            gsutil mv /tmp/{scrapy_path}{version}/data/{entity}.jl {gcs_versions_path}
         """.format(
             scrapy_path=SCRAPY_PATH,
             gcs_versions_path=gcs_file_path.format(
@@ -165,12 +165,14 @@ def create_tasks_for_version(version):
                 version=version,
                 current_date_time="{{ task_instance.xcom_pull(task_ids='generate_current_date') }}"
             ),
+            crawler=crawler,
+            entity=entity,
             version=version
         )
 
     get_urls_task = BashOperator(
         task_id='get_urls_{version}'.format(version=version),
-        bash_command=get_bash_command('urls'),
+        bash_command=get_bash_command('urls', 'plauers_url_list'),
         dag=dag
     )
     load_urls_to_bq_task = GoogleCloudStorageToBigQueryOperator(
@@ -186,7 +188,7 @@ def create_tasks_for_version(version):
         **DEFAULT_GCS_TO_BQ_CONFIG
     )
     create_urls_bq_table = BigQueryOperator(
-        task_id='create_urls_bq_table',
+        task_id='create_urls_bq_table_{version}'.format(version=version),
         sql="""
             SELECT * FROM fifaeng.staging.urls WHERE processed_at = (
                 SELECT MAX(processed_at) FROM fifaeng.staging.urls WHERE version_name = "{version}"
@@ -200,7 +202,7 @@ def create_tasks_for_version(version):
     )
     get_players_task = BashOperator(
         task_id='get_players_{version}'.format(version=version),
-        bash_command=get_bash_command('players'),
+        bash_command=get_bash_command('players', 'players'),
         dag=dag
     )
     load_players_to_bq_task = GoogleCloudStorageToBigQueryOperator(
@@ -217,7 +219,7 @@ def create_tasks_for_version(version):
         **DEFAULT_GCS_TO_BQ_CONFIG
     )
     create_players_bq_table = BigQueryOperator(
-        task_id='create_players_bq_table',
+        task_id='create_players_bq_table_{version}'.format(version=version),
         sql="""
             SELECT * FROM fifaeng.staging.players WHERE processed_at = (
                 SELECT MAX(processed_at) FROM fifaeng.staging.players WHERE version_name = "{version}"
