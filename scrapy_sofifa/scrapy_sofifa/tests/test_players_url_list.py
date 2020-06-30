@@ -29,6 +29,12 @@ class PlayersURLListTests(TestCase):
         self.assertEqual('200044', urls[0]['version_id'])
         self.assertEqual('Fifa 20', urls[0]['version_name'])
 
+    def test_return_players_when_nickname_is_empty(self):
+        with open('test_pages/urls/test_no_name.htm', 'r') as file:
+            urls = list(self.spider.parse(self.partial_html_response(body=file.read())))
+
+        self.assertEqual(61, len(urls))
+
     @patch('scrapy_sofifa.spiders.players_url_list.Request')
     def test_create_the_next_request_when_it_has_the_next_link_and_is_the_first_page(self, request_mock):
         with open('test_pages/urls/test_first_page.htm', 'r') as file:

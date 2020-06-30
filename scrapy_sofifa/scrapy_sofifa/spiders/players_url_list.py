@@ -48,7 +48,7 @@ class PlayersURLListSpider(Spider):
                     player_url=row.css('td.col-name')[0].css('a::attr(href)').get()
                 ),
                 'player_id': int(row.css('td.col-name')[0].css('a::attr(href)').get().split('/')[2]),
-                'player_nickname': [name.strip() for name in row.css('td.col-name a div::text').getall() if name.strip()][0],
+                'player_nickname': _get_nickname(row),
                 'version_id': utils.get_page_version_id(response),
                 'version_name': self.version
             }
@@ -75,3 +75,10 @@ class PlayersURLListSpider(Spider):
     def _has_second_pagination_link(pagination_links):
         return len(pagination_links.getall()) == 2
 
+
+def _get_nickname(row):
+    values_on_field_name = [name.strip() for name in row.css('td.col-name a div::text').getall() if name.strip()]
+    if not values_on_field_name:
+        return ''
+
+    return values_on_field_name[0]
