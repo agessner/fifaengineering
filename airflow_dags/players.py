@@ -17,8 +17,8 @@ VERSIONS_BQ_SCHEMA = [
 ]
 URLS_BQ_SCHEMA = [
     {'name': 'value', 'type': 'STRING', 'mode': 'NULLABLE'},
-    {'name': 'player_id', 'type': 'STRING', 'mode': 'NULLABLE'},
-    {'name': 'player_nickname', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'player_id', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'player_nickname', 'type': 'STRING', 'mode': 'NULLABLE'},
     {'name': 'version_id', 'type': 'STRING', 'mode': 'NULLABLE'},
     {'name': 'version_name', 'type': 'STRING', 'mode': 'NULLABLE'},
     {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
