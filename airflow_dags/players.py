@@ -235,8 +235,8 @@ def create_tasks_for_version(version):
     get_urls_task.set_downstream(load_urls_to_bq_task)
     load_urls_to_bq_task.set_downstream(create_urls_bq_table)
     create_urls_bq_table.set_downstream(get_players_task)
-    get_players_task.set_downstream(create_players_bq_table)
-    create_players_bq_table.set_downstream(load_players_to_bq_task)
+    get_players_task.set_downstream(load_players_to_bq_task)
+    load_players_to_bq_task.set_downstream(create_players_bq_table)
     return get_urls_task, load_urls_to_bq_task, get_players_task, load_players_to_bq_task
 
 
