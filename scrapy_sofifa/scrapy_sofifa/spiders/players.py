@@ -35,7 +35,7 @@ class PlayersSpider(Spider):
             yield Request(url=url['value'], meta={'counter': counter})
 
     def parse(self, response):
-        logging.info("parsing player number {counter}".format(counter=str(response.meta['counter'])))
+        logging.info("parsing player number {counter}".format(counter=str(response.meta.get('counter'))))
         yield {
             'version_id': utils.get_page_version_id(response),
             'version_name': self.version,
@@ -69,10 +69,12 @@ class PlayersSpider(Spider):
             'skill_moves': int(response.css('li.bp3-text-overflow-ellipsis::text').getall()[3]),
             'international_reputation': int(response.css('li.bp3-text-overflow-ellipsis::text').getall()[5]),
             'work_rate': response.css('li.bp3-text-overflow-ellipsis > span::text').getall()[3],
-            'body_type': response.css('li.bp3-text-overflow-ellipsis > span::text').getall()[4],
-            'real_face': response.css('li.bp3-text-overflow-ellipsis > span::text').getall()[5],
+            'body_type': response.css('li.bp3-text-overflow-ellipsis > span::text').getall()[4]
+                if _get_value_in_list_by_index(response, 'li.bp3-text-overflow-ellipsis > label::text', 5) == 'Body Type' else '',
+            'real_face': response.css('li.bp3-text-overflow-ellipsis > span::text').getall()[5]
+                if _get_value_in_list_by_index(response, 'li.bp3-text-overflow-ellipsis > label::text', 6) == 'Real Face' else '',
             'release_clause': _get_clean_value(
-                response.css('li.bp3-text-overflow-ellipsis > span::text').getall()[6]
+                _get_value_in_list_by_index(response, 'li.bp3-text-overflow-ellipsis > span::text', index=6)
             ),
             'specialities': [
                 _create_speciality(speciality) for speciality in response.css('li.bp3-text-overflow-ellipsis > a').getall()
@@ -97,6 +99,13 @@ class PlayersSpider(Spider):
             'national_team_position': _get_national_team_info(response, 'div.player-card > ul > li:nth-child(2) > span::text'),
             'national_team_jersey_number': int(_get_national_team_info(response, 'div.player-card > ul > li:nth-child(3)::text')) if _get_national_team_info(response, 'div.player-card > ul > li:nth-child(3)::text') else '',
         }
+
+
+def _get_value_in_list_by_index(response, css, index):
+    list_value = response.css(css).getall()
+    if len(list_value) <= index:
+        return ''
+    return list_value[index]
 
 
 def _convert_feet_inches_to_meters(feet_inches):

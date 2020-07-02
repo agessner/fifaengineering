@@ -6,7 +6,7 @@ from unittest import TestCase
 import scrapy
 from scrapy.http import HtmlResponse
 
-from spiders.players import PlayersSpider
+from scrapy_sofifa.spiders.players import PlayersSpider
 
 
 class PlayersURLListTests(TestCase):
@@ -163,11 +163,23 @@ class PlayersURLListTests(TestCase):
 
         self.assertEqual('Messi', player['body_type'])
 
+    def test_body_type_when_no_body_type(self):
+        with open('test_pages/players/test_fifa_07.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['body_type'])
+
     def test_real_face(self):
         with open('test_pages/players/test_messi.htm', 'r') as page:
             player = next(self.spider.parse(self.partial_html_response(body=page.read())))
 
         self.assertEqual('Yes', player['real_face'])
+
+    def test_real_face_when_no_real_face(self):
+        with open('test_pages/players/test_fifa_07.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['real_face'])
 
     def test_release_clause(self):
         with open('test_pages/players/test_messi.htm', 'r') as page:
@@ -177,6 +189,12 @@ class PlayersURLListTests(TestCase):
 
     def test_release_clause_when_no_release_clause(self):
         with open('test_pages/players/test_no_release_clause.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('', player['release_clause'])
+
+    def test_release_clause_when_no_column_release_clause(self):
+        with open('test_pages/players/test_fifa_07.htm', 'r') as page:
             player = next(self.spider.parse(self.partial_html_response(body=page.read())))
 
         self.assertEqual('', player['release_clause'])
