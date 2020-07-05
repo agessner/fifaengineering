@@ -51,4 +51,4 @@ WITH
     AND players_in_each_position.first_version = players.version_name
   )
 
-SELECT * FROM final_query WHERE team_name = 'Arsenal'
+SELECT * FROM final_query
