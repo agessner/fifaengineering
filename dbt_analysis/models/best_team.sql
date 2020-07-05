@@ -14,12 +14,25 @@ WITH
     AND urls.version_id = players.version_id
   ),
   max_rating_by_position AS (
-    SELECT team_name, player_position, MAX(overall_rating) AS rating FROM players GROUP BY team_name, player_position
+    SELECT 
+      team_name,
+      player_position, 
+      MAX(overall_rating) AS rating
+    FROM players GROUP BY team_name, player_position
   ),
   players_in_each_position AS (
     SELECT
+      MIN(players.version_name) AS first_version,
+      players.team_name,
+      players.player_position,
+      players.overall_rating AS rating,
+    FROM players
+    GROUP BY team_name, player_position, rating
+  ),
+  final_query AS (
+    SELECT
       name,
-      version_name,
+      players.version_name,
       players.team_name,
       players.player_position,
       players.overall_rating,
@@ -27,9 +40,15 @@ WITH
       players.id,
       players.image_url
     FROM players
-    JOIN max_rating_by_position ON max_rating_by_position.player_position = players.player_position
+    JOIN max_rating_by_position 
+    ON max_rating_by_position.player_position = players.player_position
     AND max_rating_by_position.team_name = players.team_name
     AND max_rating_by_position.rating = players.overall_rating
+    JOIN players_in_each_position 
+    ON players_in_each_position.player_position = players.player_position
+    AND players_in_each_position.team_name = players.team_name
+    AND players_in_each_position.rating = players.overall_rating
+    AND players_in_each_position.first_version = players.version_name
   )
 
-SELECT * FROM players_in_each_position
+SELECT * FROM final_query WHERE team_name = 'Arsenal'
