@@ -5,13 +5,14 @@ WITH
       overall_rating,
       players.version_name,
       urls.player_nickname AS name,
-      position AS player_position,
+      team_position AS player_position,
       urls.value AS url,
       id,
       image_url
-    FROM `sofifa.players_*` players, UNNEST(positions) position
+    FROM `sofifa.players_*` players
     JOIN `sofifa.urls_*` urls ON urls.player_id = players.id
     AND urls.version_id = players.version_id
+    AND team_position != 'RES' AND team_position != 'SUB'
   ),
   max_rating_by_position AS (
     SELECT 
