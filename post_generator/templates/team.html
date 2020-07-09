@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Best Team</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+
+    <div class="main">
+        <div class="config">
+            <div><span>Team: </span><input id="team" type="file"></div>
+            <div><span>Team Logo URL:</span><input id="teamLogoURL"/></div>
+        </div>
+        <div id="imgPost" class="post">
+            <div class="title">BEST OVERALL TEAM</div>
+            <div class="logo">
+                <img src="https://logodownload.org/wp-content/uploads/2017/02/Arsenal-logo-escudo-shield.png">
+            </div>
+            <div class="stats">
+                <div class="avg">
+                    <label>Avg: </label>
+                    <div class="avg-value stats-value"></div>
+                </div>
+                <div class="min">
+                    <label>Min: </label>
+                    <div class="min-value stats-value"></div>
+                </div>
+                <div class="max">
+                    <label>Max: </label>
+                    <div class="max-value stats-value"></div>
+                </div>
+            </div>
+            <div class="field">
+            </div>
+            <table></table>
+        </div>
+    </div>
+    <script>
+
+        $('#team').on('change', e => {
+           const file = e.target.files[0]
+           const reader = new FileReader()
+           reader.readAsText(file,'UTF-8')
+           reader.onload = readerEvent => {
+              const content = readerEvent.target.result
+              loadPayers($.parseJSON(content))
+           }
+
+        })
+
+        updateStats = () => {
+            let overallCheckedSum = 0
+            let overallCheckedLength = 0
+            let max = 0
+            let min = 99
+            $('tr').each((index, player) => {
+                const checked = $(player).find('input:checked').length
+                if (checked) {
+                    var overall = parseFloat($(player).find('td:nth-child(4)').text())
+                    overallCheckedSum += overall
+                    overallCheckedLength += 1
+                    if (overall < min) {
+                        min = overall
+                    }
+                    if (overall > max) {
+                        max = overall
+                    }
+                }
+            })
+            const avg = Math.round(overallCheckedSum/overallCheckedLength)
+            $('.avg-value').text(avg)
+            updateOverallColor($('.avg-value'), avg)
+            $('.min-value').text(min)
+            updateOverallColor($('.min-value'), min)
+            $('.max-value').text(max)
+            updateOverallColor($('.max-value'), max)
+        }
+
+        updateOverallColor = (element, value) => {
+            element.removeClass('lower-than-61')
+            element.removeClass('lower-than-71')
+            element.removeClass('lower-than-81')
+            element.removeClass('lower-than-99')
+            element.addClass(getRatingClass(value))
+        }
+
+        getRatingClass = (overall) => {
+            if (parseInt(overall) < 61) {
+                return 'lower-than-61'
+            }
+
+            if (parseInt(overall) < 71) {
+                return 'lower-than-71'
+            }
+
+            if (parseInt(overall) < 81) {
+                return 'lower-than-81'
+            }
+            return 'lower-than-99'
+        }
+
+        loadPayers = (players) => {
+            $('div.field').empty()
+            $('table').empty()
+            $.each(players, function(index, player) {
+                let playerDiv = ""
+                playerDiv += "<div class='player " + index + "'>"
+                playerDiv += "    <div class='player-image'>"
+                playerDiv += "        <img src='" + player.image_url + "'>"
+                playerDiv += "    </div>"
+                playerDiv += "    <div class='label'>"
+                playerDiv += "        <div class='name'>" + player.name + "</div>"
+                playerDiv += "        <div class='fifa-version'>"
+                playerDiv += "            <div class='fifa-version'>"
+                playerDiv += "                <img src=" + verionsImage[player.version_name] + ">"
+                playerDiv += "            </div>"
+                playerDiv += "            <div class='overall " + getRatingClass(player.overall_rating) + "'>" + player.overall_rating + "</div>"
+                playerDiv += "        </div>"
+                playerDiv += "    </div>"
+                playerDiv += "</div>"
+                $('div.field').append(playerDiv)
+                $('.player.' + index + '').css('margin', divPositions[player.player_position]['margin'])
+                $('.player.' + index + '').draggable()
+
+                selectPlayer = (e) => {
+                    var id = $(e.target).attr('id')
+                    $('.' + id).toggle()
+                    updateStats()
+                }
+
+                $('table').append($('<tr>').append(
+                    $('<td>').text(player.name),
+                    $('<td>').text(player.player_position),
+                    $('<td>').text(player.version_name),
+                    $('<td>').text(player.overall_rating),
+                    $('<td>').append('<input id=' + index + ' type="checkbox" checked>')
+                ))
+                $('#' + index).on('change', selectPlayer)
+            })
+        }
+
+        const divPositions = {
+            'GK': { 'margin': '398px auto auto auto' },
+            'SW' : { 'margin': '305px 160px auto auto' },
+            'RWB' : { 'margin': '270px 160px auto 180px' },
+            'RB' : { 'margin': '305px 160px auto 200px' },
+            'RCB' : { 'margin': '305px 160px auto 105px' },
+            'CB' : { 'margin': '305px 160px auto auto' },
+            'LCB' : { 'margin': '305px 160px auto -105px' },
+            'LB' : { 'margin': '305px 160px auto -200px' },
+            'LWB' : { 'margin': '270px 160px auto -180px' },
+            'RDM' : { 'margin': '236px 140px auto 92px' },
+            'CDM' : { 'margin': '236px 140px auto auto' },
+            'LDM' : { 'margin': '236px 140px auto -92px' },
+            'RM' : { 'margin': '150px 160px auto 149px' },
+            'RCM' : { 'margin': '195px 140px auto 72px' },
+            'CM' : { 'margin': '195px 140px auto auto' },
+            'LCM' : { 'margin': '195px 140px auto -72px' },
+            'LM' : { 'margin': '150px 160px auto -149px' },
+            'RW' : { 'margin': '80px 160px auto 110px' },
+            'RAM' : { 'margin': '130px 140px auto 78px' },
+            'CAM' : { 'margin': '130px 140px auto auto' },
+            'LAM' : { 'margin': '130px 140px auto -78px' },
+            'LW' : { 'margin': '80px 160px auto -110px' },
+            'RF' : { 'margin': '80px 160px auto 110px' },
+            'RS' : { 'margin': '42px 160px auto 60px' },
+            'CF' : { 'margin': '105px 140px auto auto' },
+            'LS' : { 'margin': '42px 160px auto -60px' },
+            'LF' : { 'margin': '42px 160px auto -110px' },
+            'ST' : { 'margin': '42px 140px auto auto' },
+        }
+
+        const verionsImage = {
+            '07': 'fifa-logos/fifa-07.jpg',
+            '08': 'fifa-logos/fifa-08.jpg',
+            '09': 'fifa-logos/fifa-09.jpg',
+            '10': 'fifa-logos/fifa-10.jpg',
+            '11': 'fifa-logos/fifa-11.jpg',
+            '12': 'fifa-logos/fifa-12.jpg',
+            '13': 'fifa-logos/fifa-13.jpg',
+            '14': 'fifa-logos/fifa-14.jpg',
+            '15': 'fifa-logos/fifa-15.jpg',
+            '16': 'fifa-logos/fifa-16.jpg',
+            '17': 'fifa-logos/fifa-17.jpg',
+            '18': 'fifa-logos/fifa-18.jpg',
+            '19': 'fifa-logos/fifa-19.jpg',
+            '20': 'fifa-logos/fifa-20.jpg'
+        }
+
+        $('#teamLogoURL').on('change', event => {
+            $('.logo > img').attr('src', event.target.value)
+        })
+
+    </script>
+</body>
+</html>
