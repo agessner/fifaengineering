@@ -1,4 +1,4 @@
-WITH (
+WITH
     players AS (
         SELECT
             id,
@@ -13,7 +13,7 @@ WITH (
         FROM `sofifa.players_*` players
         JOIN `sofifa.urls_*` urls ON urls.player_id = players.id
         AND urls.version_id = players.version_id
-        LEFT JOIN {{ref('positions')}} positions ON positions.position = players.player_position
+        LEFT JOIN {{ref('positions')}} positions ON positions.position = players.team_position
     ),
     players_in_each_position AS (
         SELECT
@@ -24,8 +24,6 @@ WITH (
         FROM players
         GROUP BY team_name, player_position, rating
     )
-
-)
 
 SELECT players.* FROM players 
 JOIN players_in_each_position 
