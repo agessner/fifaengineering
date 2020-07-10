@@ -4,13 +4,13 @@ WITH
       team_name,
       player_position, 
       MIN(overall_rating) AS rating
-    FROM {{ref('players')}} 
+    FROM {{ref('unique_players_by_team_position')}} 
     GROUP BY team_name, player_position
   )
 
 SELECT
   players.* 
-FROM {{ref('players')}} players
+FROM {{ref('unique_players_by_team_position')}} players
 JOIN min_rating_by_position 
 ON min_rating_by_position.player_position = players.player_position
 AND min_rating_by_position.team_name = players.team_name
