@@ -7,6 +7,10 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="../file.js"></script>
+    <script src="../overall.js"></script>
+    <script src="../controls.js"></script>
+    <link rel="stylesheet" type="text/css" href="../overall.css">
 </head>
 <body>
 
@@ -40,18 +44,6 @@
         </div>
     </div>
     <script>
-
-        $('#team').on('change', e => {
-           const file = e.target.files[0]
-           const reader = new FileReader()
-           reader.readAsText(file,'UTF-8')
-           reader.onload = readerEvent => {
-              const content = readerEvent.target.result
-              loadPayers($.parseJSON(content))
-           }
-
-        })
-
         updateStats = () => {
             let overallCheckedSum = 0
             let overallCheckedLength = 0
@@ -80,30 +72,7 @@
             updateOverallColor($('.max-value'), max)
         }
 
-        updateOverallColor = (element, value) => {
-            element.removeClass('lower-than-61')
-            element.removeClass('lower-than-71')
-            element.removeClass('lower-than-81')
-            element.removeClass('lower-than-99')
-            element.addClass(getRatingClass(value))
-        }
-
-        getRatingClass = (overall) => {
-            if (parseInt(overall) < 61) {
-                return 'lower-than-61'
-            }
-
-            if (parseInt(overall) < 71) {
-                return 'lower-than-71'
-            }
-
-            if (parseInt(overall) < 81) {
-                return 'lower-than-81'
-            }
-            return 'lower-than-99'
-        }
-
-        loadPayers = (players) => {
+        loadFileContent('#team', players => {
             $('div.field').empty()
             $('table').empty()
             $.each(players, function(index, player) {
@@ -116,7 +85,7 @@
                 playerDiv += "        <div class='name'>" + player.name + "</div>"
                 playerDiv += "        <div class='fifa-version'>"
                 playerDiv += "            <div class='fifa-version'>"
-                playerDiv += "                <img src=" + verionsImage[player.version_name] + ">"
+                playerDiv += "                <img src='../fifa-logos/fifa-" + player.version_name + ".jpg'>"
                 playerDiv += "            </div>"
                 playerDiv += "            <div class='overall " + getRatingClass(player.overall_rating) + "'>" + player.overall_rating + "</div>"
                 playerDiv += "        </div>"
@@ -141,7 +110,7 @@
                 ))
                 $('#' + index).on('change', selectPlayer)
             })
-        }
+        })
 
         const divPositions = {
             'GK': { 'margin': '398px auto auto auto' },
@@ -172,23 +141,6 @@
             'LS' : { 'margin': '42px 160px auto -60px' },
             'LF' : { 'margin': '42px 160px auto -110px' },
             'ST' : { 'margin': '42px 140px auto auto' },
-        }
-
-        const verionsImage = {
-            '07': 'fifa-logos/fifa-07.jpg',
-            '08': 'fifa-logos/fifa-08.jpg',
-            '09': 'fifa-logos/fifa-09.jpg',
-            '10': 'fifa-logos/fifa-10.jpg',
-            '11': 'fifa-logos/fifa-11.jpg',
-            '12': 'fifa-logos/fifa-12.jpg',
-            '13': 'fifa-logos/fifa-13.jpg',
-            '14': 'fifa-logos/fifa-14.jpg',
-            '15': 'fifa-logos/fifa-15.jpg',
-            '16': 'fifa-logos/fifa-16.jpg',
-            '17': 'fifa-logos/fifa-17.jpg',
-            '18': 'fifa-logos/fifa-18.jpg',
-            '19': 'fifa-logos/fifa-19.jpg',
-            '20': 'fifa-logos/fifa-20.jpg'
         }
 
         $('#teamLogoURL').on('change', event => {
