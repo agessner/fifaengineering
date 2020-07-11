@@ -7,7 +7,8 @@
     players.version_name,
     urls.value AS url,
     image_url,
-    positions.position_order
+    positions.position_order,
+    team_image_url
 FROM `sofifa.players_*` players
 JOIN `sofifa.urls_*` urls ON urls.player_id = players.id
 AND urls.version_id = players.version_id
