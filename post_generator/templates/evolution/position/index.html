@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Evolution Position</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+
+    <div class="main">
+        <div class="config">
+            <div><span>Player: </span><input id="player" type="file"></div>
+            <div><span>Player Image URL:</span><input id="playerImageURL"/></div>
+        </div>
+        <div id="imgPost" class="post">
+            <img src="../../tfs-logo.png" class="tfs-logo">
+            <div class="title">
+                <div class="player-name-text">Best GKs</div>
+
+            </div>
+            <div class="chart"></div>
+        </div>
+    </div>
+    <script>
+
+        $('#player').on('change', e => {
+           const file = e.target.files[0]
+           const reader = new FileReader()
+           reader.readAsText(file,'UTF-8')
+           reader.onload = readerEvent => {
+              const content = readerEvent.target.result
+              loadPlayerEvolution($.parseJSON(content))
+           }
+
+        })
+
+        loadPlayerEvolution = data => {
+            $('div.chart').empty()
+            $.each(data, (index, item) => {
+                let bar = ''
+                bar += '<div class="container">'
+                bar += '    <div class="bar" id="bar-' + index + '">'
+                bar += '    </div>'
+                bar += '    <div class="fifa-version"><img src="fifa-logos/fifa-' + item['version_name'] + '.jpg"></div>'
+                bar += '    <div class="bar-top">'
+                bar += '        <div class="overall" id="overall-' + index + '">' + item['max'] + '</div>'
+                bar += '    </div>'
+                bar += '    <div class="team-logo"><img src="' + item['image_url'] + '"></div>'
+                bar += '    <div class="name">'+ item['name'] + '</div>'
+                bar += '</div>'
+
+                $('div.chart').append(bar)
+                updateOverallColor($('#overall-' + index), item['max'])
+                $('#bar-' + index).css('width', item['max'] * item['max'] / 40)
+            })
+
+        }
+
+        updateOverallColor = (element, value) => {
+            element.removeClass('lower-than-61')
+            element.removeClass('lower-than-71')
+            element.removeClass('lower-than-81')
+            element.removeClass('lower-than-99')
+            element.addClass(getRatingClass(value))
+        }
+
+        updateOverallColor = (element, value) => {
+            element.removeClass('lower-than-61')
+            element.removeClass('lower-than-71')
+            element.removeClass('lower-than-81')
+            element.removeClass('lower-than-99')
+            element.addClass(getRatingClass(value))
+        }
+
+        getRatingClass = (overall) => {
+            if (parseInt(overall) < 61) {
+                return 'lower-than-61'
+            }
+
+            if (parseInt(overall) < 71) {
+                return 'lower-than-71'
+            }
+
+            if (parseInt(overall) < 81) {
+                return 'lower-than-81'
+            }
+            return 'lower-than-99'
+        }
+    </script>
+</body>
+</html>
