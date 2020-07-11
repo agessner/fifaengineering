@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Best Team</title>
+    <title>Player</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -13,8 +13,15 @@
     <div class="main">
         <div class="config">
             <div><span>Player: </span><input id="player" type="file"></div>
-            <div><span>Player Image URL:</span><input id="playerImageURL"/></div>
+            <div>
+                <span>Player Image URL:</span><input id="playerImageURL"/>
+                Top: <input type="range" min="-300" max="300" value="50" class="slider" id="imageTop">
+                Left: <input type="range" min="-300" max="300" value="50" class="slider" id="imageLeft">
+                Width: <input type="range" min="200" max="900" value="350" class="slider" id="imageWidth">
+                Height: <input type="range" min="200" max="900" value="350" class="slider" id="imageHeight">
+            </div>
         </div>
+        <div class="background-image"></div>
         <div id="imgPost" class="post">
             <img src="../../tfs-logo.png" class="tfs-logo">
             <div class="title">
@@ -45,7 +52,7 @@
                 bar += '        <div class="team-logo"><img src="' + item['team_image_url'] + '"></div>'
                 bar += '        <div class="overall" id="overall-' + index + '">' + item['overall_rating'] + '</div>'
                 bar += '    </div>'
-                bar += '    <div class="fifa-version"><img src="fifa-logos/fifa-' + item['version_name'] + '.jpg"></div>'
+                bar += '    <div class="fifa-version"><img src="../../fifa-logos/fifa-' + item['version_name'] + '.jpg"></div>'
                 bar += '</div>'
 
                 $('div.chart').append(bar)
@@ -114,9 +121,29 @@
             return 'lower-than-99'
         }
 
-        $('#teamLogoURL').on('change', event => {
-            $('.logo > img').attr('src', event.target.value)
+        $('#playerImageURL').on('change', event => {
+            $('.background-image').css('background-image', 'url("' + event.target.value + '")')
         })
+
+        $('#imageTop').on('input', event => {
+            updateProperty($('.background-image'), 'top', event)
+        })
+
+        $('#imageLeft').on('input', event => {
+            updateProperty($('.background-image'), 'left', event)
+        })
+
+        $('#imageWidth').on('input', event => {
+            updateProperty($('.background-image'), 'width', event)
+        })
+
+        $('#imageHeight').on('input', event => {
+            updateProperty($('.background-image'), 'height', event)
+        })
+
+        const updateProperty = (element, property, event) => {
+            element.css(property, event.target.value + 'px')
+        }
 
     </script>
 </body>
