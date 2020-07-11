@@ -9,6 +9,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="../../file.js"></script>
     <script src="../../overall.js"></script>
+    <script src="../../controls.js"></script>
     <link rel="stylesheet" type="text/css" href="../../overall.css">
 </head>
 <body>
@@ -53,30 +54,10 @@
             })
 
         })
-
-        $('#playerImageURL').on('change', event => {
-            $('.background-image').css('background-image', 'url("' + event.target.value + '")')
+        $('.background-image').on('change', event => {
+            image.css('background-image', 'url("' + event.target.value + '")')
         })
-
-        $('#imageTop').on('input', event => {
-            updateProperty($('.background-image'), 'top', event)
-        })
-
-        $('#imageLeft').on('input', event => {
-            updateProperty($('.background-image'), 'left', event)
-        })
-
-        $('#imageWidth').on('input', event => {
-            updateProperty($('.background-image'), 'width', event)
-        })
-
-        $('#imageHeight').on('input', event => {
-            updateProperty($('.background-image'), 'height', event)
-        })
-
-        const updateProperty = (element, property, event) => {
-            element.css(property, event.target.value + 'px')
-        }
+        createImageControls($('.background-image'), $('#imageTop'), $('#imageLeft'), $('#imageWidth'), $('#imageHeight'))
 
     </script>
 </body>
