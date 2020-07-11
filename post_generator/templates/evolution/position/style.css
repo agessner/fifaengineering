@@ -1,6 +1,6 @@
 @font-face {
   font-family: prompt-regular;
-  src: url(fonts/Prompt/Prompt-Regular.ttf);
+  src: url(../../fonts/Prompt/Prompt-Regular.ttf);
 }
 
 body {
@@ -17,7 +17,7 @@ body {
     padding-top: 20px;
 }
 
-.post::after {
+.background-image {
     content: "";
     background: url("https://images.daznservices.com/di/library/omnisport/83/fd/iker-casillas-cropped_vl1g9vvanrh81m70ciokt200t.jpg?t=1198944658&quality=100");
     opacity: 0.3;
@@ -55,30 +55,14 @@ body {
 }
 
 .overall {
-    color: white;
-    width: 25px;
     justify-content: center;
     display: flex;
     height: 15px;
     font-size: 13px;
     align-items: center;
+    top: 0px !important;
 }
 
-.lower-than-99 {
-    background-color: green !important;
-}
-
-.lower-than-81 {
-    background-color: #9bbf30 !important;
-}
-
-.lower-than-71 {
-    background-color: #ffc940 !important;
-}
-
-.lower-than-61 {
-    background-color: #e77e23 !important;
-}
 
 .team-logo img {
     width: 25px;
