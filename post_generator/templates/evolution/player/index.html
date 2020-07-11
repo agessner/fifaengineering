@@ -7,6 +7,9 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="../../file.js"></script>
+    <script src="../../overall.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../overall.css">
 </head>
 <body>
 
@@ -31,19 +34,7 @@
         </div>
     </div>
     <script>
-
-        $('#player').on('change', e => {
-           const file = e.target.files[0]
-           const reader = new FileReader()
-           reader.readAsText(file,'UTF-8')
-           reader.onload = readerEvent => {
-              const content = readerEvent.target.result
-              loadPlayerEvolution($.parseJSON(content))
-           }
-
-        })
-
-        loadPlayerEvolution = (data) => {
+        loadFileContent('#player', data => {
             $('div.chart').empty()
             $.each(data, (index, item) => {
                 let bar = ''
@@ -58,68 +49,10 @@
                 $('div.chart').append(bar)
                 updateOverallColor($('#overall-' + index), item['overall_rating'])
                 $('#bar-' + index).css('height', item['overall_rating'] * item['overall_rating'] / 25)
+                $('.player-name-text').text(item['name'])
             })
 
-        }
-
-        updateOverallColor = (element, value) => {
-            element.removeClass('lower-than-61')
-            element.removeClass('lower-than-71')
-            element.removeClass('lower-than-81')
-            element.removeClass('lower-than-99')
-            element.addClass(getRatingClass(value))
-        }
-
-        updateStats = () => {
-            let overallCheckedSum = 0
-            let overallCheckedLength = 0
-            let max = 0
-            let min = 99
-            $('tr').each((index, player) => {
-                const checked = $(player).find('input:checked').length
-                if (checked) {
-                    var overall = parseFloat($(player).find('td:nth-child(4)').text())
-                    overallCheckedSum += overall
-                    overallCheckedLength += 1
-                    if (overall < min) {
-                        min = overall
-                    }
-                    if (overall > max) {
-                        max = overall
-                    }
-                }
-            })
-            const avg = Math.round(overallCheckedSum/overallCheckedLength)
-            $('.avg-value').text(avg)
-            updateOverallColor($('.avg-value'), avg)
-            $('.min-value').text(min)
-            updateOverallColor($('.min-value'), min)
-            $('.max-value').text(max)
-            updateOverallColor($('.max-value'), max)
-        }
-
-        updateOverallColor = (element, value) => {
-            element.removeClass('lower-than-61')
-            element.removeClass('lower-than-71')
-            element.removeClass('lower-than-81')
-            element.removeClass('lower-than-99')
-            element.addClass(getRatingClass(value))
-        }
-
-        getRatingClass = (overall) => {
-            if (parseInt(overall) < 61) {
-                return 'lower-than-61'
-            }
-
-            if (parseInt(overall) < 71) {
-                return 'lower-than-71'
-            }
-
-            if (parseInt(overall) < 81) {
-                return 'lower-than-81'
-            }
-            return 'lower-than-99'
-        }
+        })
 
         $('#playerImageURL').on('change', event => {
             $('.background-image').css('background-image', 'url("' + event.target.value + '")')
