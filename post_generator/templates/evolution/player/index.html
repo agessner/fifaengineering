@@ -54,8 +54,8 @@
             })
 
         })
-        $('.background-image').on('change', event => {
-            image.css('background-image', 'url("' + event.target.value + '")')
+        $('#playerImageURL').on('change', event => {
+            $('.background-image').css('background-image', 'url("' + event.target.value + '")')
         })
         createImageControls($('.background-image'), $('#imageTop'), $('#imageLeft'), $('#imageWidth'), $('#imageHeight'))
 
