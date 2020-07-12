@@ -69,6 +69,7 @@ PLAYERS_BQ_SCHEMA = [
     {'name': 'national_team_overall', 'type': 'INTEGER', 'mode': 'NULLABLE'},
     {'name': 'national_team_position', 'type': 'STRING', 'mode': 'NULLABLE'},
     {'name': 'national_team_jersey_number', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'best_position', 'type': 'STRING', 'mode': 'NULLABLE'},
     {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
 ]
 

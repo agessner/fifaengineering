@@ -97,7 +97,7 @@ class PlayersSpider(Spider):
             'national_team_image_url': _get_national_team_info(response, 'div.player-card > img::attr(data-src)'),
             'national_team_overall': int(_get_national_team_info(response, 'div.player-card > ul > li > span:nth-child(1)::text')) if _get_national_team_info(response, 'div.player-card > ul > li > span:nth-child(1)::text') else '',
             'national_team_position': _get_national_team_info(response, 'div.player-card > ul > li:nth-child(2) > span::text'),
-            'national_team_jersey_number': int(_get_national_team_info(response, 'div.player-card > ul > li:nth-child(3)::text')) if _get_national_team_info(response, 'div.player-card > ul > li:nth-child(3)::text') else '',
+            'best_position': _get_best_position(response)
         }
 
 
@@ -260,3 +260,7 @@ def _get_contract_valid_until(response):
         else _get_team_info(response, 'div.player-card > ul > li:nth-child(4)::text')
     is_a_year = _is_a_number(value)
     return date(int(value), 12, 31) if is_a_year else _convert_date(value)
+
+
+def _get_best_position(response):
+    return response.css('label:contains("Best Position") + span::text').get()

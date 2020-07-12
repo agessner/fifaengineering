@@ -730,3 +730,27 @@ class WhenNoJoinedDateNorLoanedTests(TestCase):
             player = next(self.spider.parse(self.partial_html_response(body=page.read())))
 
         self.assertEqual(date(2009, 12, 31), player['contract_valid_until'])
+
+
+class BestPositionTests(TestCase):
+    def setUp(self):
+        self.spider = PlayersSpider(version='Fifa 20')
+        self.partial_html_response = partial(
+            HtmlResponse,
+            url='http://test.com',
+            request=scrapy.Request(url='http://test.com'),
+            encoding='utf-8'
+        )
+
+    def _get_page_result(self, page_url):
+        with open(page_url, 'r') as page:
+            return next(self.spider.parse(self.partial_html_response(body=page.read())))['best_position']
+
+    def test_messi(self):
+        self.assertEqual('RW', self._get_page_result('test_pages/players/test_messi.htm'))
+
+    def test_fifa_07(self):
+        self.assertEqual('CDM', self._get_page_result('test_pages/players/test_fifa_07.htm'))
+
+    def test_no_team(self):
+        self.assertEqual('CB', self._get_page_result('test_pages/players/test_no_team.htm'))
