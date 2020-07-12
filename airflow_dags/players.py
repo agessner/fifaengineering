@@ -70,6 +70,16 @@ PLAYERS_BQ_SCHEMA = [
     {'name': 'national_team_position', 'type': 'STRING', 'mode': 'NULLABLE'},
     {'name': 'national_team_jersey_number', 'type': 'INTEGER', 'mode': 'NULLABLE'},
     {'name': 'best_position', 'type': 'STRING', 'mode': 'NULLABLE'},
+    {'name': 'crossing', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'finishing', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'heading_accuracy', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'short_passing', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'volleys', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'dribbling', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'curve', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'fk_accuracy', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'long_passing', 'type': 'INTEGER', 'mode': 'NULLABLE'},
+    {'name': 'ball_control', 'type': 'INTEGER', 'mode': 'NULLABLE'},
     {'name': 'processed_at', 'type': 'DATETIME', 'mode': 'NULLABLE'}
 ]
 

@@ -371,6 +371,72 @@ class PlayersURLListTests(TestCase):
 
         self.assertEqual('', player['national_team_jersey_number'])
 
+    def test_best_position(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual('RW', player['best_position'])
+
+    def test_crossing(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(88, player['crossing'])
+
+    def test_finishing(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(95, player['finishing'])
+
+    def test_heading_accuracy(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(70, player['heading_accuracy'])
+
+    def test_short_passing(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(92, player['short_passing'])
+
+    def test_volleys(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(88, player['volleys'])
+
+    def test_dribbling(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(97, player['dribbling'])
+
+    def test_curve(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(93, player['curve'])
+
+    def test_fk_accuracy(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(94, player['fk_accuracy'])
+
+    def test_long_passing(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(92, player['long_passing'])
+
+    def test_ball_control(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(96, player['ball_control'])
+
 
 class WhenNoTeamOnlyNationalTests(TestCase):
     def setUp(self):
@@ -730,27 +796,3 @@ class WhenNoJoinedDateNorLoanedTests(TestCase):
             player = next(self.spider.parse(self.partial_html_response(body=page.read())))
 
         self.assertEqual(date(2009, 12, 31), player['contract_valid_until'])
-
-
-class BestPositionTests(TestCase):
-    def setUp(self):
-        self.spider = PlayersSpider(version='Fifa 20')
-        self.partial_html_response = partial(
-            HtmlResponse,
-            url='http://test.com',
-            request=scrapy.Request(url='http://test.com'),
-            encoding='utf-8'
-        )
-
-    def _get_page_result(self, page_url):
-        with open(page_url, 'r') as page:
-            return next(self.spider.parse(self.partial_html_response(body=page.read())))['best_position']
-
-    def test_messi(self):
-        self.assertEqual('RW', self._get_page_result('test_pages/players/test_messi.htm'))
-
-    def test_fifa_07(self):
-        self.assertEqual('CDM', self._get_page_result('test_pages/players/test_fifa_07.htm'))
-
-    def test_no_team(self):
-        self.assertEqual('CB', self._get_page_result('test_pages/players/test_no_team.htm'))

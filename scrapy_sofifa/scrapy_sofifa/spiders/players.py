@@ -97,7 +97,17 @@ class PlayersSpider(Spider):
             'national_team_image_url': _get_national_team_info(response, 'div.player-card > img::attr(data-src)'),
             'national_team_overall': int(_get_national_team_info(response, 'div.player-card > ul > li > span:nth-child(1)::text')) if _get_national_team_info(response, 'div.player-card > ul > li > span:nth-child(1)::text') else '',
             'national_team_position': _get_national_team_info(response, 'div.player-card > ul > li:nth-child(2) > span::text'),
-            'best_position': _get_best_position(response)
+            'best_position': _get_best_position(response),
+            'crossing': _get_stat_value_by_label(response, 'Crossing'),
+            'finishing': _get_stat_value_by_label(response, 'Finishing'),
+            'heading_accuracy': _get_stat_value_by_label(response, 'Heading Accuracy'),
+            'short_passing': _get_stat_value_by_label(response, 'Short Passing'),
+            'volleys': _get_stat_value_by_label(response, 'Volleys'),
+            'dribbling': _get_stat_value_by_label(response, 'Dribbling'),
+            'curve': _get_stat_value_by_label(response, 'Curve'),
+            'fk_accuracy': _get_stat_value_by_label(response, 'FK Accuracy'),
+            'long_passing': _get_stat_value_by_label(response, 'Long Passing'),
+            'ball_control': _get_stat_value_by_label(response, 'Ball Control'),
         }
 
 
@@ -264,3 +274,8 @@ def _get_contract_valid_until(response):
 
 def _get_best_position(response):
     return response.css('label:contains("Best Position") + span::text').get()
+
+
+def _get_stat_value_by_label(response, label):
+    value = response.xpath('//span[text()="{label}"]/preceding-sibling::span/text()'.format(label=label)).get()
+    return int(value) if value else ''
