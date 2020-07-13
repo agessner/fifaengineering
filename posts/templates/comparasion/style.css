@@ -9,7 +9,7 @@ body {
 
 .chart {
     display: flex;
-    height: 500px;
+    height: 460px;
     width: 500px;
     background-color: rgba(35, 124, 42, 0.18);
     justify-content: space-evenly;
@@ -26,7 +26,7 @@ body {
     position: absolute;
     z-index: -1;
     width: 762px;
-    height: 160px;
+    height: 150px;
     top: 252px;
     left: -19px;
 }
@@ -39,9 +39,9 @@ body {
     right: 0;
     position: absolute;
     z-index: -1;
-    height: 160px;
+    height: 150px;
     width: 821px;
-    top: 412px;
+    top: 402px;
     left: -6px;
 }
 
@@ -54,9 +54,9 @@ body {
     position: absolute;
     z-index: -1;
     width: 683px;
-    height: 160px;
-    top: 572px;
-    left: -160px;
+    height: 153px;
+    left: -14px;
+    top: 552px;
 }
 
 .bar {
@@ -65,16 +65,10 @@ body {
     width: 25px;
 }
 
-.fifa-version {
+.fifa-logo {
     display: flex;
-    flex-direction: column-reverse;
-}
-
-.fifa-version img {
-    width: 54px;
-    transform: rotate(-90deg);
-    margin: 0px 0px 95px -35px;
-    opacity: 0.9;
+    width: 35%;
+    margin-left: 5px;
 }
 
 .team-logo img {
@@ -91,9 +85,8 @@ body {
     width: 35px;
     opacity: 0.7;
     display: flex;
-    padding-left: 4px;
     left: 465px;
-    top: 60px;
+    top: 660px;
     position: absolute;
 }
 
@@ -102,14 +95,18 @@ body {
     font-weight: bold;
     color: #3e3c3c;
     position: absolute;
-    flex-direction: row;
-    text-align: center;
+    width: 500px;
+    display: flex;
 }
 
 .title .player-name-text {
     background: #4CAF50;
     padding: 0 5px 0 5px;
     color: white;
+    display: flex;
+    width: 70%;
+    margin-left: 10px;
+    justify-content: center;
 }
 
 .player {
