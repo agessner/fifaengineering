@@ -7,7 +7,7 @@ import utils
 
 SOFIFA_URL = 'https://sofifa.com'
 BASE_URL = 'https://sofifa.com/players?r={version_id}&set=true&offset={offset}'
-LAST_KNOWN_PAGE = 5500
+LAST_KNOWN_PAGE = 8000
 NUMBER_OF_PLAYERS_BY_PAGE = 60
 
 
