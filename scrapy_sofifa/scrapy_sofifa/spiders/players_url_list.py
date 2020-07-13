@@ -29,7 +29,7 @@ class PlayersURLListSpider(Spider):
             SELECT 
                 version_id
             FROM sofifa.versions WHERE version_name = "FIFA {version}" 
-            ORDER BY version_id
+            ORDER BY version_id DESC
             LIMIT 1
         '''.format(
             version=self.version
