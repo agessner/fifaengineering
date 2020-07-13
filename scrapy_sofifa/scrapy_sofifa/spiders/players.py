@@ -38,7 +38,7 @@ class PlayersSpider(Spider):
         logging.info("parsing player number {counter}".format(counter=str(response.meta.get('counter'))))
         yield {
             'version_id': utils.get_page_version_id(response),
-            'version_name': self.version,
+            'version_name': utils.get_page_version_id(response)[0:2],
             'full_name': response.css('div.player .info > h1::text').get().split('(')[0].strip(),
             'id': int(re.findall('[0-9]+', response.css('div.player .info > h1::text').get())[0]),
             'image_url': response.css('div.player > img').attrib['data-src'],
