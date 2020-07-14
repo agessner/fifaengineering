@@ -2,17 +2,17 @@ WITH
   max_rating_by_position AS (
     SELECT 
       team_name,
-      player_position, 
+      team_position, 
       MAX(overall_rating) AS rating
     FROM {{ref('unique_players_by_team_position')}} 
-    GROUP BY team_name, player_position
+    GROUP BY team_name, team_position
   )
 
 SELECT
   players.* 
 FROM {{ref('unique_players_by_team_position')}} players
 JOIN max_rating_by_position 
-ON max_rating_by_position.player_position = players.player_position
+ON max_rating_by_position.team_position = players.team_position
 AND max_rating_by_position.team_name = players.team_name
 AND max_rating_by_position.rating = players.overall_rating
-WHERE players.player_position != 'RES' AND players.player_position != 'SUB'
+WHERE players.team_position != 'RES' AND players.team_position != 'SUB'
