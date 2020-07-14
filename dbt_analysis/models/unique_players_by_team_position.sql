@@ -6,7 +6,7 @@ WITH
             players.team_position,
             players.overall_rating AS rating,
         FROM {{ref('players')}} players
-        GROUP BY team_name, player_position, rating
+        GROUP BY team_name, team_position, rating
     )
 
 SELECT players.* FROM {{ref('players')}} players 
