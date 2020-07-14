@@ -42,6 +42,24 @@
             </div>
             <table></table>
         </div>
+
+        <textarea rows="15" cols="100" id="postDescription">
+{team} Worst X Best Starting XI FIFA Team from 07-20
+Do you agree?
+
+How we build this squad 🛠
+- We get the lower and higher overall for each position
+- Game updates are NOT considered, only the first version of the main release
+- If two players have the same overall, we get the older one (we like nostalgia 👩‍🦳👨‍🦳)
+- SUBs are not considered
+- Finally, the squad formation is decided by the one we like the most 👨‍🎨👩‍🎨
+
+FOLLOW: @thefifastats
+FOLLOW: @thefifastats
+FOLLOW: @thefifastats
+
+More teams and more stats to come!
+        </textarea>
     </div>
     <script>
         updateStats = () => {
@@ -109,18 +127,20 @@
                     $('<td>').append('<input id=' + index + ' type="checkbox" checked>')
                 ))
                 $('#' + index).on('change', selectPlayer)
+                $('#postDescription').text($('#postDescription').text().replace('{team}', player.team_name))
+                $('.logo > img').attr('src', player.team_image_url)
             })
         })
 
         const divPositions = {
-            'GK': { 'margin': '398px auto auto auto' },
+            'GK': { 'margin': '380px auto auto auto' },
             'SW' : { 'margin': '305px 160px auto auto' },
             'RWB' : { 'margin': '270px 160px auto 180px' },
-            'RB' : { 'margin': '305px 160px auto 200px' },
-            'RCB' : { 'margin': '305px 160px auto 105px' },
+            'RB' : { 'margin': '305px 160px auto 195px' },
+            'RCB' : { 'margin': '305px 160px auto 95px' },
             'CB' : { 'margin': '305px 160px auto auto' },
-            'LCB' : { 'margin': '305px 160px auto -105px' },
-            'LB' : { 'margin': '305px 160px auto -200px' },
+            'LCB' : { 'margin': '305px 160px auto -95px' },
+            'LB' : { 'margin': '305px 160px auto -195px' },
             'LWB' : { 'margin': '270px 160px auto -180px' },
             'RDM' : { 'margin': '236px 140px auto 92px' },
             'CDM' : { 'margin': '236px 140px auto auto' },

@@ -16,8 +16,39 @@
 
     <div class="main">
         <div class="config">
-            <div><span>Player: </span><input id="player" type="file"></div>
-            <span>Player Image URL:</span><input id="playerImageURL"/>
+            <div><span>Players: </span><input id="player" type="file"></div>
+            <span>Background Image URL:</span><input id="playerImageURL"/>
+            <select id="positionSelect">
+                <option>GK</option>
+                <option>SW</option>
+                <option>RWB</option>
+                <option>RB</option>
+                <option>RCB</option>
+                <option>CB</option>
+                <option>LCB</option>
+                <option>LB</option>
+                <option>LWB</option>
+                <option>RDM</option>
+                <option>CDM</option>
+                <option>LDM</option>
+                <option>RM</option>
+                <option>RCM</option>
+                <option>CM</option>
+                <option>LCM</option>
+                <option>LM</option>
+                <option>RW</option>
+                <option>RAM</option>
+                <option>CAM</option>
+                <option>LAM</option>
+                <option>LW</option>
+                <option>RF</option>
+                <option>RS</option>
+                <option>CF</option>
+                <option>LS</option>
+                <option>LF</option>
+                <option>ST</option>
+            </select>
+            <input id="mainColor" type="color" >
             Top: <input type="range" min="-300" max="300" value="50" class="slider" id="imageTop">
             Left: <input type="range" min="-300" max="300" value="50" class="slider" id="imageLeft">
             Width: <input type="range" min="200" max="900" value="350" class="slider" id="imageWidth">
@@ -31,6 +62,21 @@
 
             </div>
             <div class="chart"></div>
+            <textarea rows="15" cols="100" id="postDescription">
+Those are the best {position} from FIFA 07-20
+Which one do you like the most?
+
+How we build this graph 🛠
+- We get the max overall for each FIFA Version
+- Game updates are NOT considered, only the first version of the main release
+- If two players have the same overall, we choose the one we like the most!
+
+FOLLOW: @thefifastats
+FOLLOW: @thefifastats
+FOLLOW: @thefifastats
+
+More players and more stats to come!
+            </textarea>
         </div>
     </div>
     <script>
@@ -54,10 +100,17 @@
                 $('#bar-' + index).css('width', item['value'] * item['value'] / 40)
             })
         })
-        console.log($('.background-image'))
         $('#playerImageURL').on('change', event => {
-            console.log(event.target.value)
             $('.background-image').css('background-image', 'url("' + event.target.value + '")')
+        })
+        $('#positionSelect').on('change', event => {
+            $('.player-name-text').text('BEST ' + event.target.value + 's')
+            $('#postDescription').text($('#postDescription').text().replace('{position}', event.target.value + '\'s'))
+        })
+        $('#mainColor').on('change', event => {
+
+            $('.player-name-text').css('background', event.target.value)
+            $('.bar').css('background-color', event.target.value)
         })
         createImageControls($('.background-image'), $('#imageTop'), $('#imageLeft'), $('#imageWidth'), $('#imageHeight'))
     </script>
