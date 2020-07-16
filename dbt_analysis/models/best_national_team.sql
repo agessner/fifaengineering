@@ -34,7 +34,6 @@ SELECT
   positions.position_order  
 FROM max_rating_player players
 LEFT JOIN {{ref('positions')}} positions ON positions.position = players.player_position
-WHERE players.country = 'England'
 UNION ALL
 SELECT
   players.* EXCEPT(position_order),
@@ -45,4 +44,3 @@ ON second_max_rating_by_position.player_position = players.player_position
 AND second_max_rating_by_position.country = players.country
 AND second_max_rating_by_position.rating = players.overall_rating
 LEFT JOIN {{ref('positions')}} positions ON positions.position = players.player_position
-WHERE players.country = 'England' ORDER BY position_order
