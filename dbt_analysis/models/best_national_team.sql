@@ -25,7 +25,7 @@ WITH
     JOIN max_rating_player ON max_rating_player.country = second_max_rating.country
     AND max_rating_player.player_position = second_max_rating.player_position
     AND max_rating_player.id != second_max_rating.id
-    AND max_rating_player.overall_rating >= second_max_rating.overall_rating 
+    AND max_rating_player.overall_rating > second_max_rating.overall_rating 
     GROUP BY country, player_position    
   )
 
