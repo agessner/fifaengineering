@@ -437,6 +437,150 @@ class PlayersURLListTests(TestCase):
 
         self.assertEqual(96, player['ball_control'])
 
+    def test_acceleration(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(91, player['acceleration'])
+
+    def test_sprint_speed(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(84, player['sprint_speed'])
+
+    def test_agility(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(93, player['agility'])
+
+    def test_reactions(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(95, player['reactions'])
+
+    def test_balance(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(95, player['balance'])
+
+    def test_shot_power(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(86, player['shot_power'])
+
+    def test_jumping(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(68, player['jumping'])
+
+    def test_stamina(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(75, player['stamina'])
+
+    def test_strength(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(68, player['strength'])
+
+    def test_long_shots(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(94, player['long_shots'])
+
+    def test_aggression(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(48, player['aggression'])
+
+    def test_interceptions(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(40, player['interceptions'])
+
+    def test_positioning(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(94, player['positioning'])
+
+    def test_vision(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(94, player['vision'])
+
+    def test_penalties(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(75, player['penalties'])
+
+    def test_composure(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(96, player['composure'])
+
+    def test_defensive_awareness(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(33, player['defensive_awareness'])
+
+    def test_standing_tackle(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(37, player['standing_tackle'])
+
+    def test_sliding_tackle(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(26, player['sliding_tackle'])
+
+    def test_gk_diving(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(6, player['gk_diving'])
+
+    def test_gk_handling(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(11, player['gk_handling'])
+
+    def test_gk_kicking(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(15, player['gk_kicking'])
+
+    def test_gk_positioning(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(14, player['gk_positioning'])
+
+    def test_gk_reflexes(self):
+        with open('test_pages/players/test_messi.htm', 'r') as page:
+            player = next(self.spider.parse(self.partial_html_response(body=page.read())))
+
+        self.assertEqual(8, player['gk_reflexes'])
+
 
 class WhenNoTeamOnlyNationalTests(TestCase):
     def setUp(self):

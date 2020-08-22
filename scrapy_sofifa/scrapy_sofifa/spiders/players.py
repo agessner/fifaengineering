@@ -9,7 +9,6 @@ from scrapy import Spider, Request
 import utils
 
 SOFIFA_URL = 'https://sofifa.com'
-LAST_KNOWN_PAGE = 6740
 NUMBER_OF_PLAYERS_BY_PAGE = 60
 
 
@@ -108,6 +107,30 @@ class PlayersSpider(Spider):
             'fk_accuracy': _get_stat_value_by_label(response, 'FK Accuracy'),
             'long_passing': _get_stat_value_by_label(response, 'Long Passing'),
             'ball_control': _get_stat_value_by_label(response, 'Ball Control'),
+            'acceleration': _get_stat_value_by_label(response, 'Acceleration'),
+            'sprint_speed': _get_stat_value_by_label(response, 'Sprint Speed'),
+            'agility': _get_stat_value_by_label(response, 'Agility'),
+            'reactions': _get_stat_value_by_label(response, 'Reactions'),
+            'balance': _get_stat_value_by_label(response, 'Balance'),
+            'shot_power': _get_stat_value_by_label(response, 'Shot Power'),
+            'jumping': _get_stat_value_by_label(response, 'Jumping'),
+            'stamina': _get_stat_value_by_label(response, 'Stamina'),
+            'strength': _get_stat_value_by_label(response, 'Strength'),
+            'long_shots': _get_stat_value_by_label(response, 'Long Shots'),
+            'aggression': _get_stat_value_by_label(response, 'Aggression'),
+            'interceptions': _get_stat_value_by_label(response, 'Interceptions'),
+            'positioning': _get_stat_value_by_label(response, 'Positioning'),
+            'vision': _get_stat_value_by_label(response, 'Vision'),
+            'penalties': _get_stat_value_by_label(response, 'Penalties'),
+            'composure': _get_stat_value_by_label(response, 'Composure'),
+            'defensive_awareness': _get_stat_value_by_label(response, 'Defensive Awareness'),
+            'standing_tackle': _get_stat_value_by_label(response, 'Standing Tackle'),
+            'sliding_tackle': _get_stat_value_by_label(response, 'Sliding Tackle'),
+            'gk_diving': _get_gk_stat_value_by_label(response, 'GK Diving'),
+            'gk_handling': _get_gk_stat_value_by_label(response, 'GK Handling'),
+            'gk_kicking': _get_gk_stat_value_by_label(response, 'GK Kicking'),
+            'gk_positioning': _get_gk_stat_value_by_label(response, 'GK Positioning'),
+            'gk_reflexes': _get_gk_stat_value_by_label(response, 'GK Reflexes')
         }
 
 
@@ -278,4 +301,9 @@ def _get_best_position(response):
 
 def _get_stat_value_by_label(response, label):
     value = response.xpath('//span[text()="{label}"]/preceding-sibling::span/text()'.format(label=label)).get()
+    return int(value) if value else ''
+
+
+def _get_gk_stat_value_by_label(response, label):
+    value = response.xpath('//li[text()=" {label}"]/node()/text()'.format(label=label)).get()
     return int(value) if value else ''
