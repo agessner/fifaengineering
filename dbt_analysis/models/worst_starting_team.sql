@@ -11,7 +11,7 @@ WITH
   players_from_min_rating AS (
     SELECT
         players.*
-    FROM {{ref('unique_players_by_team_position')}} players
+    FROM {{ref('unique_players_by_overall_first_version_and_team_position')}} players
     JOIN min_rating_by_position
     ON players.team_name = min_rating_by_position.team_name
     AND players.team_position = min_rating_by_position.team_position
@@ -33,7 +33,7 @@ WITH
   players_from_second_min_rating AS (
     SELECT
         players.*
-    FROM {{ref('unique_players_by_team_position')}} players
+    FROM {{ref('unique_players_by_overall_first_version_and_team_position')}} players
     JOIN second_min_rating_by_position
     ON players.team_name = second_min_rating_by_position.team_name
     AND players.team_position = second_min_rating_by_position.team_position

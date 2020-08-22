@@ -11,7 +11,7 @@ WITH
   players_from_max_rating AS (
     SELECT
         players.*
-    FROM {{ref('unique_players_by_team_position')}} players
+    FROM {{ref('unique_players_by_overall_first_version_and_team_position')}} players
     JOIN max_rating_by_position
     ON players.team_name = max_rating_by_position.team_name
     AND players.team_position = max_rating_by_position.team_position
@@ -33,7 +33,7 @@ WITH
   players_from_second_max_rating AS (
     SELECT
         players.*
-    FROM {{ref('unique_players_by_team_position')}} players
+    FROM {{ref('unique_players_by_overall_first_version_and_team_position')}} players
     JOIN second_max_rating_by_position
     ON players.team_name = second_max_rating_by_position.team_name
     AND players.team_position = second_max_rating_by_position.team_position
