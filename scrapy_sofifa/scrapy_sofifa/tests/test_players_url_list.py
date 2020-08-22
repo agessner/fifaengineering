@@ -10,7 +10,7 @@ from scrapy_sofifa.spiders.players_url_list import PlayersURLListSpider, LAST_KN
 
 class PlayersURLListTests(TestCase):
     def setUp(self):
-        self.spider = PlayersURLListSpider(version='Fifa 20')
+        self.spider = PlayersURLListSpider(version='20')
         self.partial_html_response = partial(
             HtmlResponse,
             url='http://teste.com?offset=60&r=10',
@@ -27,7 +27,7 @@ class PlayersURLListTests(TestCase):
         self.assertEqual(226807, urls[0]['player_id'])
         self.assertEqual('C. Roldan', urls[0]['player_nickname'])
         self.assertEqual('200044', urls[0]['version_id'])
-        self.assertEqual('Fifa 20', urls[0]['version_name'])
+        self.assertEqual('20', urls[0]['version_name'])
 
     def test_return_players_when_nickname_is_empty(self):
         with open('test_pages/urls/test_no_name.htm', 'r') as file:
@@ -60,8 +60,8 @@ class PlayersURLListTests(TestCase):
     def test_doesnt_create_the_next_request_when_it_is_the_last_page(self, request_mock):
         with open('test_pages/urls/test_last_page.htm', 'r') as file:
             list(self.spider.parse(HtmlResponse(
-                url='http://teste.com?offset={last_page}'.format(last_page=LAST_KNOWN_PAGE),
-                request=scrapy.Request(url='http://teste.com?offset={last_page}'.format(last_page=LAST_KNOWN_PAGE)),
+                url='http://teste.com?offset={last_page}'.format(last_page=LAST_KNOWN_PAGE['20']),
+                request=scrapy.Request(url='http://teste.com?offset={last_page}'.format(last_page=LAST_KNOWN_PAGE['20'])),
                 body=file.read(),
                 encoding='utf-8'
             )))

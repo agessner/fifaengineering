@@ -7,7 +7,23 @@ import utils
 
 SOFIFA_URL = 'https://sofifa.com'
 BASE_URL = 'https://sofifa.com/players?r={version_id}&set=true&offset={offset}'
-LAST_KNOWN_PAGE = 8000
+LAST_KNOWN_PAGE = {
+    '07': 10899,
+    '08': 12785,
+    '09': 16213,
+    '10': 16708,
+    '11': 15203,
+    '12': 14472,
+    '13': 14988,
+    '14': 16614,
+    '15': 16431,
+    '16': 17061,
+    '17': 17560,
+    '18': 17927,
+    '19': 17974,
+    '20': 20000,
+
+}
 NUMBER_OF_PLAYERS_BY_PAGE = 60
 
 
@@ -66,7 +82,7 @@ class PlayersURLListSpider(Spider):
         if self._has_second_pagination_link(pagination_links):
             return pagination_links[1].attrib['href']
 
-        if int(parse_qs(urlparse(response.url).query)['offset'][0]) < LAST_KNOWN_PAGE:
+        if int(parse_qs(urlparse(response.url).query)['offset'][0]) < LAST_KNOWN_PAGE[self.version]:
             return '?r=' + parse_qs(urlparse(response.url).query)['r'][0] + '&set=true&offset=' + str(int(parse_qs(urlparse(response.url).query)['offset'][0]) + NUMBER_OF_PLAYERS_BY_PAGE)
 
         return None
