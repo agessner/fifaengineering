@@ -7,7 +7,7 @@ gcloud composer environments create fifaeng \
     --disk-size 20 \
     --env-variables SCRAPY_PATH=/home/airflow/gcs/dags/dependencies/scrapy_sofifa/ \
     --python-version 3 \
-    --image-version composer-latest-airflow-1.10.2 \
+    --image-version composer-latest-airflow-1.10.3 \
     --airflow-configs core-worker_concurrency=10 \
     --node-count 4 \
     --service-account dataloader@fifaeng.iam.gserviceaccount.com &&
