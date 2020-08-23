@@ -1,0 +1,1 @@
+SELECT overall_rating FROM {{ ref('players') }} WHERE overall_rating < 25
