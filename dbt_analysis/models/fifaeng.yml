@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: players
+    description: List of all players from FIFA 07-20
+    docs:
+      show: true
+    columns:
+      - name: id
+        tests:
+          - not_null
+      - name: preferred_foot
+        tests:
+          - accepted_values:
+              values: ['Left', 'Right']
+
+sources:
+  - name: sofifa
+    tables:
+      - name: players_09
+        columns:
+          - name: id
+            tests:
+              - not_null
