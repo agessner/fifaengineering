@@ -5,7 +5,7 @@ from unittest import TestCase
 import scrapy
 from scrapy.http import HtmlResponse
 
-from spiders.versions import VersionsSpider
+from scrapy_sofifa.spiders.versions import VersionsSpider
 
 
 class VersionsTests(TestCase):
@@ -55,3 +55,12 @@ class VersionsTests(TestCase):
         self.assertEqual('FIFA 07', versions_returned[1]['version_name'])
         self.assertEqual('070001', versions_returned[1]['version_id'])
         self.assertEqual(date(2006, 8, 30), versions_returned[1]['release_date'])
+
+    def test_remove_last_version_from_fifa_20_because_it_doesnt_work(self):
+        with open('test_pages/versions/test_fifa_20_page.html', 'r') as page:
+            versions_returned = list(self.spider.parse(self.partial_html_response(
+                body=page.read()
+            )))
+
+        versions_without_next_request = versions_returned[:-1]
+        self.assertEqual(57, len(versions_without_next_request))

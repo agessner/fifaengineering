@@ -16,10 +16,13 @@ class VersionsSpider(Spider):
 
     def parse(self, response):
         current_page_main_version, next_page_main_version = get_current_and_next_page_main_versions(response)
-        for (link, release_date) in zip(
+        list_of_updates = list(zip(
             response.css('div.dropdown:nth-child(2) > div.bp3-menu > a::attr(href)').getall(),
             response.css('div.dropdown:nth-child(2) > div.bp3-menu > a::text').getall()
-        ):
+        ))
+        list_of_updates = _remove_buggy_last_fifa_20_version(list_of_updates) \
+            if current_page_main_version[1] == 'FIFA 20' else list_of_updates
+        for (link, release_date) in list_of_updates:
             yield {
                 'version_name': current_page_main_version[1],
                 'version_id': utils.get_id_from_version_link(link),
@@ -28,6 +31,10 @@ class VersionsSpider(Spider):
 
         if next_page_main_version:
             yield Request('https://sofifa.com{link}'.format(link=next_page_main_version[0]), callback=self.parse)
+
+
+def _remove_buggy_last_fifa_20_version(list_of_updates):
+    return list_of_updates[:-1]
 
 
 def _convert_date(sofifa_date):
