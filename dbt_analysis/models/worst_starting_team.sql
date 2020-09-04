@@ -18,7 +18,7 @@ WITH
     AND players.overall_rating = min_rating_by_position.rating
   ),
   duplicated_players AS (
-    SELECT id, team_name, MAX(overall_rating) AS rating, ARRAY_AGG(DISTINCT team_position) AS team_positions FROM players_from_max_rating GROUP BY id, team_name HAVING COUNT(*) > 1
+    SELECT id, team_name, MAX(overall_rating) AS rating, ARRAY_AGG(DISTINCT team_position) AS team_positions FROM players_from_min_rating GROUP BY id, team_name HAVING COUNT(*) > 1
   ),
   duplicated_players_by_position AS (
     SELECT id, team_name, rating, team_position FROM duplicated_players, UNNEST(team_positions) AS team_position
