@@ -44,7 +44,31 @@
     curve, 
     fk_accuracy, 
     long_passing, 
-    ball_control
+    ball_control,
+    acceleration,
+    sprint_speed,
+    agility,
+    reactions,
+    balance,
+    shot_power,
+    jumping,
+    stamina,
+    strength,
+    long_shots,
+    aggression,
+    interceptions,
+    positioning,
+    vision,
+    penalties,
+    composure,
+    defensive_awareness,
+    standing_tackle,
+    sliding_tackle,
+    gk_diving,
+    gk_handling,
+    gk_kicking,
+    gk_positioning,
+    gk_reflexes
 FROM `sofifa.players_*` players
 JOIN `sofifa.urls_*` urls ON urls.player_id = players.id
 AND urls.version_id = players.version_id
