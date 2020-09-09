@@ -4,6 +4,7 @@ from google.cloud import bigquery
 from scrapy import Spider, Request
 
 import utils
+from scrapy_sofifa.spiders.gateways import get_last_version_id_from_main_version
 
 SOFIFA_URL = 'https://sofifa.com'
 BASE_URL = 'https://sofifa.com/players?r={version_id}&set=true&offset={offset}'
@@ -35,17 +36,7 @@ class PlayersURLListSpider(Spider):
         self.version = version
 
     def start_requests(self):
-        bigquery_connection = bigquery.Client(project='fifaeng')
-        query = bigquery_connection.query('''
-            SELECT 
-                version_id
-            FROM sofifa.versions WHERE version_name = "FIFA {version}" 
-            ORDER BY version_id DESC
-            LIMIT 1
-        '''.format(
-            version=self.version
-        ))
-        for url in query.result():
+        for url in get_last_version_id_from_main_version(self.version):
             yield Request(url=BASE_URL.format(
                 version_id=url['version_id'],
                 offset=0
