@@ -1,6 +1,5 @@
 from urllib.parse import urlparse, parse_qs
 
-from google.cloud import bigquery
 from scrapy import Spider, Request
 
 import utils
@@ -45,37 +44,25 @@ class PlayersURLListSpider(Spider):
     def parse(self, response):
         for row in response.css('tbody > tr'):
             yield {
-                'value': '{sofifa_url}{player_url}'.format(
-                    sofifa_url=SOFIFA_URL,
-                    player_url=row.css('td.col-name')[0].css('a::attr(href)').get()
-                ),
-                'player_id': int(row.css('td.col-name')[0].css('a::attr(href)').get().split('/')[2]),
+                'value': '{sofifa_url}{player_url}'.format(sofifa_url=SOFIFA_URL, player_url=_get_player_url(row)),
+                'player_id': _get_player_id(row),
                 'player_nickname': _get_nickname(row),
                 'version_id': utils.get_page_version_id(response),
                 'version_name': self.version
             }
 
-        next_page = self._get_next_page(response)
+        next_page = _get_next_page(response, self.version)
         if next_page is not None:
             next_page = response.urljoin(next_page)
             yield Request(next_page, callback=self.parse)
 
-    def _get_next_page(self, response):
-        pagination_links = response.css('div.pagination > a')
-        if pagination_links.css('span::text').get() == 'Next':
-            return pagination_links.attrib['href']
 
-        if self._has_second_pagination_link(pagination_links):
-            return pagination_links[1].attrib['href']
+def _get_player_url(row):
+    return row.css('td.col-name')[0].css('a::attr(href)').get()
 
-        if int(parse_qs(urlparse(response.url).query)['offset'][0]) < LAST_KNOWN_PAGE[self.version]:
-            return '?r=' + parse_qs(urlparse(response.url).query)['r'][0] + '&set=true&offset=' + str(int(parse_qs(urlparse(response.url).query)['offset'][0]) + NUMBER_OF_PLAYERS_BY_PAGE)
 
-        return None
-
-    @staticmethod
-    def _has_second_pagination_link(pagination_links):
-        return len(pagination_links.getall()) == 2
+def _get_player_id(row):
+    return int(_get_player_url(row).split('/')[2])
 
 
 def _get_nickname(row):
@@ -84,3 +71,32 @@ def _get_nickname(row):
         return ''
 
     return values_on_field_name[0]
+
+
+def _get_next_page(response, version):
+    pagination_links = response.css('div.pagination > a')
+    if pagination_links.css('span::text').get() == 'Next':
+        return pagination_links.attrib['href']
+
+    if _has_second_pagination_link(pagination_links):
+        return pagination_links[1].attrib['href']
+
+    if _current_offset_is_lower_than_the_last_known(response, version):
+        return '?r={version_id}&set=true&offset={next_offset}'.format(
+            version_id=_get_url_arg(response, 'r'),
+            next_offset=str(int(_get_url_arg(response, 'offset')) + NUMBER_OF_PLAYERS_BY_PAGE)
+        )
+
+    return None
+
+
+def _has_second_pagination_link(pagination_links):
+    return len(pagination_links.getall()) == 2
+
+
+def _current_offset_is_lower_than_the_last_known(response, version):
+    return int(parse_qs(urlparse(response.url).query)['offset'][0]) < LAST_KNOWN_PAGE[version]
+
+
+def _get_url_arg(response, arg):
+    return parse_qs(urlparse(response.url).query)[arg][0]
