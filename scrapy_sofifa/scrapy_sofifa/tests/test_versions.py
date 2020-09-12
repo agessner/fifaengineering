@@ -18,20 +18,23 @@ class VersionsTests(TestCase):
             encoding='utf-8'
         )
 
-    def test_return_versions(self):
-        with open('test_pages/versions/test_fifa_08_page.htm', 'r') as page:
-            versions_returned = list(self.spider.parse(self.partial_html_response(
-                body=page.read()
-            )))
+    def _parse(self, page):
+        with open('test_pages/versions/{page}'.format(page=page), 'r') as file:
+            versions = list(self.spider.parse(self.partial_html_response(body=file.read())))
 
-        versions_without_next_request = versions_returned[:-1]
-        self.assertEqual(2, len(versions_without_next_request))
-        self.assertEqual('FIFA 08', versions_without_next_request[0]['version_name'])
-        self.assertEqual('080002', versions_without_next_request[0]['version_id'])
-        self.assertEqual(date(2008, 2, 22), versions_without_next_request[0]['release_date'])
-        self.assertEqual('FIFA 08', versions_without_next_request[1]['version_name'])
-        self.assertEqual('080001', versions_without_next_request[1]['version_id'])
-        self.assertEqual(date(2007, 8, 30), versions_without_next_request[1]['release_date'])
+        versions_without_next_request = list(versions)[0:-1]
+        return versions_without_next_request
+
+    def test_return_versions(self):
+        versions = self._parse('test_fifa_08_page.htm')
+
+        self.assertEqual(2, len(versions))
+        self.assertEqual('FIFA 08', versions[0]['version_name'])
+        self.assertEqual('080002', versions[0]['version_id'])
+        self.assertEqual(date(2008, 2, 22), versions[0]['release_date'])
+        self.assertEqual('FIFA 08', versions[1]['version_name'])
+        self.assertEqual('080001', versions[1]['version_id'])
+        self.assertEqual(date(2007, 8, 30), versions[1]['release_date'])
 
     def test_return_next_request(self):
         with open('test_pages/versions/test_fifa_08_page.htm', 'r') as page:
@@ -44,23 +47,19 @@ class VersionsTests(TestCase):
 
     def test_return_only_versions_when_is_the_last_page(self):
         with open('test_pages/versions/test_last_page.htm', 'r') as page:
-            versions_returned = list(self.spider.parse(self.partial_html_response(
+            versions = list(self.spider.parse(self.partial_html_response(
                 body=page.read()
             )))
 
-        self.assertEqual(2, len(versions_returned))
-        self.assertEqual('FIFA 07', versions_returned[0]['version_name'])
-        self.assertEqual('070002', versions_returned[0]['version_id'])
-        self.assertEqual(date(2007, 2, 22), versions_returned[0]['release_date'])
-        self.assertEqual('FIFA 07', versions_returned[1]['version_name'])
-        self.assertEqual('070001', versions_returned[1]['version_id'])
-        self.assertEqual(date(2006, 8, 30), versions_returned[1]['release_date'])
+        self.assertEqual(2, len(versions))
+        self.assertEqual('FIFA 07', versions[0]['version_name'])
+        self.assertEqual('070002', versions[0]['version_id'])
+        self.assertEqual(date(2007, 2, 22), versions[0]['release_date'])
+        self.assertEqual('FIFA 07', versions[1]['version_name'])
+        self.assertEqual('070001', versions[1]['version_id'])
+        self.assertEqual(date(2006, 8, 30), versions[1]['release_date'])
 
     def test_remove_last_version_from_fifa_20_because_it_doesnt_work(self):
-        with open('test_pages/versions/test_fifa_20_page.html', 'r') as page:
-            versions_returned = list(self.spider.parse(self.partial_html_response(
-                body=page.read()
-            )))
+        versions = self._parse('test_fifa_20_page.html')
 
-        versions_without_next_request = versions_returned[:-1]
-        self.assertEqual(57, len(versions_without_next_request))
+        self.assertEqual(57, len(versions))
