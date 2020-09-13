@@ -1,12 +1,11 @@
-import logging
 import re
 from datetime import datetime, date
 from decimal import Decimal, InvalidOperation
 
-from google.cloud import bigquery
 from scrapy import Spider, Request
 
 import utils
+from scrapy_sofifa.spiders.gateways import get_urls_from_version
 
 SOFIFA_URL = 'https://sofifa.com'
 NUMBER_OF_PLAYERS_BY_PAGE = 60
@@ -14,27 +13,16 @@ NUMBER_OF_PLAYERS_BY_PAGE = 60
 
 class PlayersSpider(Spider):
     name = 'players'
-    custom_settings = {
-        'ITEM_PIPELINES': {
-            'scrapy_sofifa.pipelines.DefaultPipeline': 400
-        }
-    }
 
     def __init__(self, version=None, *args, **kwargs):
         super(PlayersSpider, self).__init__(*args, **kwargs)
         self.version = version
 
     def start_requests(self):
-        bigquery_connection = bigquery.Client(project='fifaeng')
-        query = bigquery_connection.query('SELECT value FROM sofifa.urls_{version}'.format(version=self.version))
-        counter = 0
-        for url in query.result():
-            counter = counter + 1
-            logging.info("creating url number {counter}".format(counter=str(counter)))
-            yield Request(url=url['value'], meta={'counter': counter})
+        for url in get_urls_from_version(self.version):
+            yield Request(url=url['value'])
 
     def parse(self, response):
-        logging.info("parsing player number {counter}".format(counter=str(response.meta.get('counter'))))
         yield {
             'version_id': utils.get_page_version_id(response),
             'version_name': utils.get_page_version_id(response)[0:2],
@@ -96,6 +84,7 @@ class PlayersSpider(Spider):
             'national_team_image_url': _get_national_team_info(response, 'div.player-card > img::attr(data-src)'),
             'national_team_overall': int(_get_national_team_info(response, 'div.player-card > ul > li > span:nth-child(1)::text')) if _get_national_team_info(response, 'div.player-card > ul > li > span:nth-child(1)::text') else '',
             'national_team_position': _get_national_team_info(response, 'div.player-card > ul > li:nth-child(2) > span::text'),
+            'national_team_jersey_number': int(_get_national_team_info(response, 'div.player-card > ul > li:nth-child(3)::text')) if _get_national_team_info(response, 'div.player-card > ul > li:nth-child(3)::text') else '',
             'best_position': _get_best_position(response),
             'crossing': _get_stat_value_by_label(response, 'Crossing'),
             'finishing': _get_stat_value_by_label(response, 'Finishing'),
@@ -122,7 +111,7 @@ class PlayersSpider(Spider):
             'positioning': _get_stat_value_by_label(response, 'Positioning'),
             'vision': _get_stat_value_by_label(response, 'Vision'),
             'penalties': _get_stat_value_by_label(response, 'Penalties'),
-            'composure': _get_stat_value_by_label(response, 'Composure'),
+            'composure': _get_stat_value_by_label_when_no_span(response, 'Composure'),
             'defensive_awareness': _get_stat_value_by_label(response, 'Defensive Awareness'),
             'standing_tackle': _get_stat_value_by_label(response, 'Standing Tackle'),
             'sliding_tackle': _get_stat_value_by_label(response, 'Sliding Tackle'),
@@ -305,5 +294,9 @@ def _get_stat_value_by_label(response, label):
 
 
 def _get_gk_stat_value_by_label(response, label):
+    return _get_stat_value_by_label_when_no_span(response, label)
+
+
+def _get_stat_value_by_label_when_no_span(response, label):
     value = response.xpath('//li[text()=" {label}"]/node()/text()'.format(label=label)).get()
     return int(value) if value else ''

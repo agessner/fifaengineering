@@ -15,3 +15,9 @@ def get_last_version_id_from_main_version(main_version):
         version=main_version
     ))
     return query.result()
+
+
+def get_urls_from_version(version):
+    bigquery_connection = bigquery.Client(project='fifaeng')
+    query = bigquery_connection.query('SELECT value FROM sofifa.urls_{version}'.format(version=version))
+    return query.result()
