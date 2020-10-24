@@ -13,6 +13,11 @@ NUMBER_OF_PLAYERS_BY_PAGE = 60
 
 class PlayersSpider(Spider):
     name = 'players'
+    custom_settings = {
+        'ITEM_PIPELINES': {
+            'scrapy_sofifa.pipelines.DefaultPipeline': 400
+        }
+    }
 
     def __init__(self, version=None, *args, **kwargs):
         super(PlayersSpider, self).__init__(*args, **kwargs)
