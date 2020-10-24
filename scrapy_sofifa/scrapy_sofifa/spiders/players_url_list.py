@@ -22,6 +22,7 @@ LAST_KNOWN_PAGE = {
     '18': 17927,
     '19': 17974,
     '20': 20000,
+    '21': 20000
 
 }
 NUMBER_OF_PLAYERS_BY_PAGE = 60

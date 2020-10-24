@@ -277,5 +277,5 @@ def create_tasks_for_version(version):
 
 generate_current_date >> get_versions_task >> load_versions_to_bq >> create_versions_bq_table
 
-for i in range(7, 21):
+for i in range(7, 22):
     create_tasks_for_version('0' + str(i) if i < 10 else str(i))
